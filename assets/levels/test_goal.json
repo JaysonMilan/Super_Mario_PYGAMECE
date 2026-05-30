@@ -1,0 +1,199 @@
+{
+  "background": [],
+  "entities": [
+    {
+      "type": "PlayerSpawn",
+      "x": 3,
+      "y": 13
+    },
+    {
+      "type": "Goal",
+      "x": 20,
+      "y": 10
+    },
+    {
+      "type": "Coin",
+      "x": 10,
+      "y": 10
+    },
+    {
+      "type": "Goomba",
+      "x": 15,
+      "y": 13
+    }
+  ],
+  "foreground": [
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 0,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 1,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 2,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 3,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 4,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 5,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 6,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 7,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 8,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 9,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 10,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 11,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 12,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 13,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 14,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 15,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 16,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 17,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 18,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 19,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 20,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 21,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 22,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 23,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 24,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 25,
+      "y": 14
+    }
+  ],
+  "level": {
+    "camera_bounds": {
+      "max_x": 26.0,
+      "max_y": 15.0,
+      "min_x": 0.0,
+      "min_y": 0.0
+    },
+    "description": "Test level for Goal entity and timer timeout",
+    "height": 15,
+    "music": "",
+    "name": "Goal Test Level",
+    "tile_size": 1.0,
+    "time_limit": 30,
+    "width": 26
+  },
+  "version": "1.0"
+}

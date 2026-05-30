@@ -1,0 +1,849 @@
+﻿{
+    "version":  "1.0",
+    "level":  {
+                  "name":  "Castle Axe Test",
+                  "description":  "SMB-style castle bridge test: touch axe to drop bridge and defeat Bowser.",
+                  "music":  "",
+                  "width":  120,
+                  "height":  15,
+                  "tile_size":  1,
+                  "time_limit":  300,
+                  "camera_bounds":  {
+                                        "min_x":  0,
+                                        "max_x":  120,
+                                        "min_y":  0,
+                                        "max_y":  15
+                                    }
+              },
+    "foreground":  [
+                       {
+                           "x":  0,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  1,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  2,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  3,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  4,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  5,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  6,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  7,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  8,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  9,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  10,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  11,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  12,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  13,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  14,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  15,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  16,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  17,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  18,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  19,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  20,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  21,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  22,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  23,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  24,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  25,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  26,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  27,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  28,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  29,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  30,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  31,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  32,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  33,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  34,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  35,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  36,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  37,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  38,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  39,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  40,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  41,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  42,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  43,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  44,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  45,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  46,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  47,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  48,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  49,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  50,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  51,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  52,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  53,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  54,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  55,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  56,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  57,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  58,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  59,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  60,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  61,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  62,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  63,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  64,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  65,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  66,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  67,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  68,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  69,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  70,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  71,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  72,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  73,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  74,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  75,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  76,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  77,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  78,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  79,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  80,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  81,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  82,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  83,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  84,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  85,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  86,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  87,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  88,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  89,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  90,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  91,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  92,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  93,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  94,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  105,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  106,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  107,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  108,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  109,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  110,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  111,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  112,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  113,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  114,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  115,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  116,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  117,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  118,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  119,
+                           "y":  14,
+                           "type":  "Ground",
+                           "sprite":  "gnd_red_1"
+                       },
+                       {
+                           "x":  95,
+                           "y":  13,
+                           "type":  "Ground",
+                           "sprite":  "bridge_1"
+                       },
+                       {
+                           "x":  96,
+                           "y":  13,
+                           "type":  "Ground",
+                           "sprite":  "bridge_0"
+                       },
+                       {
+                           "x":  97,
+                           "y":  13,
+                           "type":  "Ground",
+                           "sprite":  "bridge_1"
+                       },
+                       {
+                           "x":  98,
+                           "y":  13,
+                           "type":  "Ground",
+                           "sprite":  "bridge_0"
+                       },
+                       {
+                           "x":  99,
+                           "y":  13,
+                           "type":  "Ground",
+                           "sprite":  "bridge_1"
+                       },
+                       {
+                           "x":  100,
+                           "y":  13,
+                           "type":  "Ground",
+                           "sprite":  "bridge_0"
+                       },
+                       {
+                           "x":  101,
+                           "y":  13,
+                           "type":  "Ground",
+                           "sprite":  "bridge_1"
+                       },
+                       {
+                           "x":  102,
+                           "y":  13,
+                           "type":  "Ground",
+                           "sprite":  "bridge_0"
+                       },
+                       {
+                           "x":  103,
+                           "y":  13,
+                           "type":  "Ground",
+                           "sprite":  "bridge_1"
+                       },
+                       {
+                           "x":  104,
+                           "y":  13,
+                           "type":  "Ground",
+                           "sprite":  "bridge_0"
+                       },
+                       {
+                           "x":  88,
+                           "y":  11,
+                           "type":  "Brick",
+                           "sprite":  "brickred"
+                       },
+                       {
+                           "x":  89,
+                           "y":  11,
+                           "type":  "Brick",
+                           "sprite":  "brickred"
+                       },
+                       {
+                           "x":  90,
+                           "y":  11,
+                           "type":  "Brick",
+                           "sprite":  "brickred"
+                       },
+                       {
+                           "x":  91,
+                           "y":  11,
+                           "type":  "Brick",
+                           "sprite":  "brickred"
+                       },
+                       {
+                           "x":  92,
+                           "y":  11,
+                           "type":  "Brick",
+                           "sprite":  "brickred"
+                       },
+                       {
+                           "x":  93,
+                           "y":  11,
+                           "type":  "Brick",
+                           "sprite":  "brickred"
+                       },
+                       {
+                           "x":  94,
+                           "y":  11,
+                           "type":  "Brick",
+                           "sprite":  "brickred"
+                       },
+                       {
+                           "x":  20,
+                           "y":  10,
+                           "type":  "QuestionBlock",
+                           "sprite":  "blockq_0",
+                           "item_content":  1
+                       },
+                       {
+                           "x":  22,
+                           "y":  10,
+                           "type":  "QuestionBlock",
+                           "sprite":  "blockq_0",
+                           "item_content":  2
+                       },
+                       {
+                           "x":  106,
+                           "y":  12,
+                           "type":  "Brick",
+                           "sprite":  "brickred"
+                       },
+                       {
+                           "x":  107,
+                           "y":  12,
+                           "type":  "Brick",
+                           "sprite":  "brickred"
+                       },
+                       {
+                           "x":  108,
+                           "y":  12,
+                           "type":  "Brick",
+                           "sprite":  "brickred"
+                       }
+                   ],
+    "background":  [
+
+                   ],
+    "entities":  [
+                     {
+                         "type":  "PlayerSpawn",
+                         "x":  3,
+                         "y":  14
+                     },
+                     {
+                         "type":  "Goomba",
+                         "x":  14,
+                         "y":  14
+                     },
+                     {
+                         "type":  "Mushroom",
+                         "x":  22,
+                         "y":  10
+                     },
+                     {
+                         "type":  "Bowser",
+                         "x":  100,
+                         "y":  13
+                     },
+                     {
+                         "type":  "CastleAxe",
+                         "x":  108,
+                         "y":  12
+                     },
+                     {
+                         "type":  "Goal",
+                         "x":  116,
+                         "y":  10
+                     }
+                 ]
+}
