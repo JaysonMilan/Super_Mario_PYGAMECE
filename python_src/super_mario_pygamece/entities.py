@@ -26,6 +26,16 @@ class PowerState(Enum):
     FIRE = "fire"
 
 
+class PipeState(Enum):
+    NONE = "none"
+    ENTERING_DOWN = "entering_down"
+    ENTERING_RIGHT = "entering_right"
+    ENTERING_LEFT = "entering_left"
+    EXITING_UP = "exiting_up"
+    EXITING_RIGHT = "exiting_right"
+    EXITING_LEFT = "exiting_left"
+
+
 @dataclass(slots=True)
 class Player(Body):
     state: PowerState = PowerState.SMALL
@@ -36,6 +46,25 @@ class Player(Body):
     pending_state: PowerState | None = None
     death_timer: float = 0.0
     crouching: bool = False
+    is_shrinking: bool = False
+    shrink_timer: float = 0.0
+    # Pipe warping
+    pipe_state: PipeState = PipeState.NONE
+    pipe_timer: float = 0.0
+    pipe_dest_x: float = 0.0
+    pipe_dest_y: float = 0.0
+    pipe_dest_level: str = ""
+    pipe_exit_facing_right: bool = True
+    pipe_exit_horizontal: bool = False
+
+
+@dataclass
+class PlayerSession:
+    character: str  # "MARIO" or "LUIGI"
+    score: int = 0
+    coins: int = 0
+    lives: int = 3
+    state: PowerState = PowerState.SMALL
 
 
 class ShellState(Enum):
@@ -62,9 +91,14 @@ class Enemy:
     shell_state: ShellState = ShellState.WALKING
     shell_wake_timer: float = 0.0
     kick_streak: int = 0
+    kick_grace: float = 0.0  # freshly kicked shells can't hurt the kicker
+    combo_timer: float = 0.0  # C++ ComboState::kComboWindow=0.67s; resets streak when it expires
     shell_frames: tuple[str, ...] = ("koopa_shell_feet_0", "koopa_shell_feet_1")
+    fireball_hits: int = 0  # Bowser soaks several hits before going down
+    winged: bool = False  # para-koopas hop; first stomp strips the wings
+    stomp_kill: bool = False  # squish-in-place death (Goomba); no physics applied
     # Generic AI scratchpad (different enemies repurpose these fields).
-    ai_phase: int = 0
+    ai_phase: float = 0.0  # generic timer scratch (seconds accumulated or countdown)
     ai_timer: float = 0.0
     home_x: float = 0.0
     home_y: float = 0.0
@@ -112,14 +146,14 @@ class Fireball:
 class BlockBump:
     rect: pygame.Rect
     sprite: str
-    timer: float = 0.18
+    timer: float = 0.12  # C++ BlockSystem::kBlockBumpDuration = 0.12f
 
 
 @dataclass(slots=True)
 class ScorePopup:
     text: str
     pos: pygame.Vector2
-    timer: float = 0.7
+    timer: float = 1.2  # C++ ScorePopup max_lifetime = 1.2f
 
 
 @dataclass(slots=True)
@@ -128,3 +162,109 @@ class Particle:
     velocity: pygame.Vector2
     sprite: str
     timer: float = 0.6
+    age: float = 0.0
+    gravity_affected: bool = True
+
+
+@dataclass(slots=True)
+class MovingPlatform:
+    pos: pygame.Vector2
+    velocity: pygame.Vector2
+    width: float
+    start_pos: pygame.Vector2
+    end_pos: pygame.Vector2
+    speed: float
+    ease_endpoints: bool = False
+    ease_distance: float = 2.0
+    # Runtime state
+    t: float = 0.0  # 0.0 to 1.0 interpolation
+    direction: int = 1
+    delta_pos: pygame.Vector2 = field(default_factory=lambda: pygame.Vector2(0, 0))
+
+    @property
+    def rect(self) -> pygame.Rect:
+        return pygame.Rect(round(self.pos.x), round(self.pos.y), round(self.width * 32), 16)
+
+
+@dataclass(slots=True)
+class FallingPlatform:
+    pos: pygame.Vector2
+    width: float
+    fall_speed: float
+    # Runtime state
+    falling: bool = False
+    has_player: bool = False
+    delta_y: float = 0.0
+    delta_pos: pygame.Vector2 = field(default_factory=lambda: pygame.Vector2(0, 0))
+
+    @property
+    def rect(self) -> pygame.Rect:
+        return pygame.Rect(round(self.pos.x), round(self.pos.y), round(self.width * 32), 16)
+
+
+@dataclass(slots=True)
+class SeesawPlatform:
+    pos: pygame.Vector2
+    width: float
+    y_neutral: float
+    drop_threshold: float
+    # Runtime state
+    partner_idx: int = -1
+    falling: bool = False
+    has_player: bool = False
+    delta_y: float = 0.0
+    fall_speed: float = 5.0 * 32.0  # px/s  C++ SeesawPlatform::fall_speed = 5.0 t/s
+    tilt_speed: float = 1.5 * 32.0  # px/s  C++ SeesawPlatform::tilt_speed = 1.5 t/s
+    delta_pos: pygame.Vector2 = field(default_factory=lambda: pygame.Vector2(0, 0))
+
+    @property
+    def rect(self) -> pygame.Rect:
+        return pygame.Rect(round(self.pos.x), round(self.pos.y), round(self.width * 32), 16)
+
+
+@dataclass(slots=True)
+class UpFire:
+    pos: pygame.Vector2
+    origin_y: float
+    rise_height: float  # pixels (= def.rise_height * TILE_SIZE)
+    # Runtime state: 0=resting, 1=rising, 2=descending (C++ UpFireBehavior::State)
+    state: int = 0
+    progress: float = 0.0   # pixels covered in current rise/descend pass
+    rest_timer: float = 1.0  # countdown to next rise (s)
+
+    @property
+    def rect(self) -> pygame.Rect:
+        return pygame.Rect(round(self.pos.x), round(self.pos.y), 16, 16)
+
+
+@dataclass(slots=True)
+class FireBar:
+    center: pygame.Vector2
+    segments: int
+    radius: float
+    angular_speed: float
+    angle: float
+
+    @property
+    def segment_positions(self) -> list[pygame.Vector2]:
+        # C++ createFireBar: spacing = radius / (segments-1), segment i at dist = spacing*i.
+        spacing = self.radius / (self.segments - 1) if self.segments > 1 else 0.0
+        direction = pygame.math.Vector2(1, 0).rotate_rad(self.angle)
+        return [
+            pygame.Vector2(
+                self.center.x + direction.x * spacing * i,
+                self.center.y + direction.y * spacing * i,
+            )
+            for i in range(self.segments)
+        ]
+
+
+@dataclass(slots=True)
+class CheepSpawner:
+    entry_x: float
+    exit_x: float
+    spawn_y: float
+    interval_min: float
+    interval_max: float
+    # Runtime state
+    timer: float = 0.0
