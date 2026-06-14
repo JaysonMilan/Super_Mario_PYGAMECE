@@ -235,7 +235,8 @@ class UpFire:
 
     @property
     def rect(self) -> pygame.Rect:
-        return pygame.Rect(round(self.pos.x), round(self.pos.y), 16, 16)
+        # C++ kHW=0.25t=8px, kHH=0.375t=12px half-extents → 16×24 total; pos is top-left in Python.
+        return pygame.Rect(round(self.pos.x), round(self.pos.y), 16, 24)
 
 
 @dataclass(slots=True)

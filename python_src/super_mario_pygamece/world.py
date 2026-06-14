@@ -1636,6 +1636,7 @@ class GameWorld:
                 if enemy.fire_immune:
                     fireball.alive = False
                     fireball.explode_timer = 0.15
+                    self.events.append("blockhit")  # C++ plays "blockbump" on immune-enemy contact
                     break
                 if enemy.kind == "Bowser":
                     # Bowser soaks 5 fireball hits before falling (matches SDL3).
