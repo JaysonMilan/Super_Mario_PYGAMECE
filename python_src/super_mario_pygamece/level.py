@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
+from enum import IntEnum
 from pathlib import Path
 from typing import Any
 
@@ -12,30 +13,99 @@ from .paths import ProjectPaths
 from .settings import TILE_SIZE
 
 
-# Foreground tile types that should remain solid for the player and enemies.
+# Foreground tile types that are solid — matches the C++ isSolid() rule.
 SOLID_TYPES = {
     "Ground",
     "Brick",
-    "BrickFloor",
     "Pipe",
     "PipeBody",
     "PipeTop",
     "QuestionBlock",
     "Question",
     "UsedBlock",
-    "MetalBlock",
-    "Stone",
-    "Castle",
-    "Bridge",
-    "Hill",
-    "Stair",
-    "Block",
 }
+
+# Non-solid foreground tiles rendered as scenery (C++ TileType decorations).
+DECORATION_TYPES = {"Cloud", "Bush", "Hill", "Castle"}
 
 QUESTION_TYPES = {"Question", "QuestionBlock"}
 BRICK_TYPES = {"Brick"}
 
 COLLECTIBLE_TYPES = {"Coin", "Mushroom", "FireFlower", "Flower", "Star", "OneUp"}
+
+
+class WarpDirection(IntEnum):
+    DOWN = 0
+    RIGHT = 1
+    LEFT = 2
+
+
+@dataclass(frozen=True, slots=True)
+class WarpDefinition:
+    entry_tile_x: int
+    entry_tile_y: int
+    dest_level: str
+    dest_world_x: float
+    dest_world_y: float
+    exit_facing_right: bool = True
+    entry_dir: WarpDirection = WarpDirection.DOWN
+    exit_horizontal: bool = False
+
+
+@dataclass(frozen=True, slots=True)
+class MovingPlatformDef:
+    start_x: float
+    start_y: float
+    end_x: float
+    end_y: float
+    speed: float = 2.0
+    width: float = 3.0
+    ease_endpoints: bool = False
+    ease_distance: float = 2.0
+
+
+@dataclass(frozen=True, slots=True)
+class FallingPlatformDef:
+    x: float
+    y: float
+    width: float = 3.0
+    fall_speed: float = 7.5
+
+
+@dataclass(frozen=True, slots=True)
+class SeesawPlatformPairDef:
+    ax: float
+    ay: float
+    bx: float
+    by: float
+    width: float = 3.0
+    drop_threshold: float = 4.0
+
+
+@dataclass(frozen=True, slots=True)
+class UpFireDef:
+    x: float
+    origin_y: float
+    rise_height: float = 8.0
+
+
+@dataclass(frozen=True, slots=True)
+class FireBarDef:
+    center_x: float
+    center_y: float
+    segments: int = 3
+    radius: float = 1.25
+    angular_speed: float = 2.4
+    start_angle: float = 0.0
+
+
+@dataclass(frozen=True, slots=True)
+class CheepSpawnerDef:
+    entry_x: float
+    exit_x: float
+    spawn_y: float
+    interval_min: float = 0.675
+    interval_max: float = 1.700
 
 
 @dataclass(frozen=True, slots=True)
@@ -44,6 +114,9 @@ class LevelMeta:
     width: int
     height: int
     time_limit: int = 400
+    level_type: str = "Overworld"  # Overworld | Underground | Underwater | Castle
+    camera_min_x: float = 0.0   # tile units (C++ camera_bounds.min_x)
+    camera_max_x: float = 0.0   # tile units; 0 means use full level width
 
 
 ITEM_CONTENT_BY_ID: dict[int, str] = {
@@ -77,6 +150,13 @@ class LevelData:
     foreground: tuple[Tile, ...]
     background: tuple[Tile, ...]
     entities: tuple[EntitySpawn, ...]
+    warps: tuple[WarpDefinition, ...] = ()
+    moving_platforms: tuple[MovingPlatformDef, ...] = ()
+    falling_platforms: tuple[FallingPlatformDef, ...] = ()
+    seesaw_pairs: tuple[SeesawPlatformPairDef, ...] = ()
+    upfires: tuple[UpFireDef, ...] = ()
+    firebars: tuple[FireBarDef, ...] = ()
+    cheep_spawners: tuple[CheepSpawnerDef, ...] = ()
 
 
 def find_default_level(paths: ProjectPaths) -> Path | None:
@@ -97,22 +177,42 @@ def parse_level(raw: dict[str, Any], name_hint: str | None = None) -> LevelData:
     foreground = tuple(_parse_tile(tile) for tile in _dict_items(raw.get("foreground")))
     background = tuple(_parse_tile(tile) for tile in _dict_items(raw.get("background")))
     entities = tuple(_parse_entity(entity) for entity in _dict_items(raw.get("entities")))
+    warps = tuple(_parse_warp(warp) for warp in _dict_items(raw.get("warps")))
+    moving = tuple(_parse_moving(p) for p in _dict_items(raw.get("moving_platforms")))
+    falling = tuple(_parse_falling(p) for p in _dict_items(raw.get("falling_platforms")))
+    seesaws = tuple(_parse_seesaw(p) for p in _dict_items(raw.get("seesaw_pairs")))
+    upfires = tuple(_parse_upfire(p) for p in _dict_items(raw.get("upfires")))
+    firebars = tuple(_parse_firebar(p) for p in _dict_items(raw.get("firebars")))
+    cheep_spawners = tuple(_parse_cheep_spawner(p) for p in _dict_items(raw.get("cheep_spawners")))
 
     width = int(raw_level.get("width", _infer_width(foreground, entities)))
     height = int(raw_level.get("height", _infer_height(foreground, background, entities)))
 
     name = str(raw_level.get("name") or name_hint or "Pygame 1-1")
 
+    bounds = raw_level.get("camera_bounds", {})
+    cam_min_x = float(bounds.get("min_x", 0.0))
+    cam_max_x = float(bounds.get("max_x", 0.0))
     return LevelData(
         meta=LevelMeta(
             name=name,
             width=max(width, 32),
             height=max(height, 15),
             time_limit=int(raw_level.get("time_limit", 400)),
+            level_type=str(raw_level.get("level_type", "Overworld")),
+            camera_min_x=cam_min_x,
+            camera_max_x=cam_max_x,
         ),
         foreground=foreground,
         background=background,
         entities=entities,
+        warps=warps,
+        moving_platforms=moving,
+        falling_platforms=falling,
+        seesaw_pairs=seesaws,
+        upfires=upfires,
+        firebars=firebars,
+        cheep_spawners=cheep_spawners,
     )
 
 
@@ -149,6 +249,7 @@ def generate_template_level() -> LevelData:
         foreground=tuple(foreground_list),
         background=(),
         entities=entities,
+        warps=(),
     )
 
 
@@ -215,6 +316,81 @@ def _parse_entity(raw: dict[str, Any]) -> EntitySpawn:
         type=str(raw.get("type", "Unknown")),
         x=float(raw.get("x", 0)),
         y=float(raw.get("y", 0)),
+    )
+
+
+def _parse_warp(raw: dict[str, Any]) -> WarpDefinition:
+    return WarpDefinition(
+        entry_tile_x=int(raw.get("entry_tile_x", 0)),
+        entry_tile_y=int(raw.get("entry_tile_y", 0)),
+        dest_level=str(raw.get("dest_level", "")),
+        dest_world_x=float(raw.get("dest_world_x", 0.0)),
+        dest_world_y=float(raw.get("dest_world_y", 0.0)),
+        exit_facing_right=bool(raw.get("exit_facing_right", True)),
+        entry_dir=WarpDirection(int(raw.get("entry_dir", 0))),
+        exit_horizontal=bool(raw.get("exit_horizontal", False)),
+    )
+
+
+def _parse_moving(raw: dict[str, Any]) -> MovingPlatformDef:
+    return MovingPlatformDef(
+        start_x=float(raw.get("start_x", 0.0)),
+        start_y=float(raw.get("start_y", 0.0)),
+        end_x=float(raw.get("end_x", 0.0)),
+        end_y=float(raw.get("end_y", 0.0)),
+        speed=float(raw.get("speed", 2.0)),
+        width=float(raw.get("width", 3.0)),
+        ease_endpoints=bool(raw.get("ease_endpoints", False)),
+        ease_distance=float(raw.get("ease_distance", 2.0)),
+    )
+
+
+def _parse_falling(raw: dict[str, Any]) -> FallingPlatformDef:
+    return FallingPlatformDef(
+        x=float(raw.get("x", 0.0)),
+        y=float(raw.get("y", 0.0)),
+        width=float(raw.get("width", 3.0)),
+        fall_speed=float(raw.get("fall_speed", 7.5)),
+    )
+
+
+def _parse_seesaw(raw: dict[str, Any]) -> SeesawPlatformPairDef:
+    return SeesawPlatformPairDef(
+        ax=float(raw.get("ax", 0.0)),
+        ay=float(raw.get("ay", 0.0)),
+        bx=float(raw.get("bx", 0.0)),
+        by=float(raw.get("by", 0.0)),
+        width=float(raw.get("width", 3.0)),
+        drop_threshold=float(raw.get("drop_threshold", 4.0)),
+    )
+
+
+def _parse_upfire(raw: dict[str, Any]) -> UpFireDef:
+    return UpFireDef(
+        x=float(raw.get("x", 0.0)),
+        origin_y=float(raw.get("origin_y", 0.0)),
+        rise_height=float(raw.get("rise_height", 8.0)),
+    )
+
+
+def _parse_firebar(raw: dict[str, Any]) -> FireBarDef:
+    return FireBarDef(
+        center_x=float(raw.get("center_x", 0.0)),
+        center_y=float(raw.get("center_y", 0.0)),
+        segments=int(raw.get("segments", 3)),
+        radius=float(raw.get("radius", 1.25)),
+        angular_speed=float(raw.get("angular_speed", 2.4)),
+        start_angle=float(raw.get("start_angle", 0.0)),
+    )
+
+
+def _parse_cheep_spawner(raw: dict[str, Any]) -> CheepSpawnerDef:
+    return CheepSpawnerDef(
+        entry_x=float(raw.get("entry_x", 0.0)),
+        exit_x=float(raw.get("exit_x", 0.0)),
+        spawn_y=float(raw.get("spawn_y", 0.0)),
+        interval_min=float(raw.get("interval_min", 0.675)),
+        interval_max=float(raw.get("interval_max", 1.700)),
     )
 
 

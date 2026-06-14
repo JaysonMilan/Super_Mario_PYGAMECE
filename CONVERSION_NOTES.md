@@ -41,7 +41,9 @@ The Python port keeps the architecture simpler than the C++ ECS version:
 
 This is not a line-by-line ECS port and not a cycle-accurate SMB clone. The Python version intentionally keeps a smaller entity model:
 
-- Advanced C++ enemies such as Bowser, Lakitu, Piranha Plants, Bullet Bills, shells, projectiles, and editor-only behavior are not fully recreated yet.
+- Most of the C++ enemy roster is ported (Bowser, Lakitu, Piranha Plants, Bullet Bills, Hammer Bros, shells, hammers, Bowser fire), with simplified timer-based AI instead of the C++ frame/LFSR logic. Venus Fire Traps, Bloopers (bobbing AI), and Para-Koopa wing-stripping are not recreated.
+- Rule-level mechanics are kept in sync with the SDL3 game: coin = 200 points (SMB1), shell combo table 100..8000 (clamped), no points for kicking a shell, flagpole tiers 100..5000, timer drains 1 unit/sec, damage invincibility 2.5s, star 9.17s, Bowser takes 5 fireballs (+5000), Bowser fire passes through tiles, hammers vanish on landing.
+- Movement tuning (speeds, gravity, jump arcs) is deliberately the port's own feel-oriented set, not a conversion of the C++ values; the NES-authentic profile (F6 in SDL3) has no Python equivalent.
 - The in-game editor is not ported.
 - The authenticity profile in the C++ project is approximated only through feel-oriented platformer controls.
 - The Python port reuses atlas and level files from the SDL3 project instead of duplicating all assets.

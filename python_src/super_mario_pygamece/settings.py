@@ -47,4 +47,19 @@ SHELL_WAKE_TIME = 248.0 / 60.0  # C++ wake_up_delay = 248/60 ≈ 4.13 s
 # Cascading shell-combo scores; clamps at the final tier (matches SDL3 ComboState).
 STOMP_COMBO_SCORES = (100, 200, 400, 800, 1000, 2000, 4000, 8000)
 
+SPRITEBANK_SCALED_CACHE_MAX = 512
+
+# HUD layout (HUDSystem.cpp)
+HUD_ROW1 = 8
+HUD_ROW2 = 26
+HUD_X_MARIO = 16
+HUD_X_COINS = 170
+HUD_X_WORLD = 320
+HUD_X_TIME = 470
+HUD_X_LIVES = 600
+FS_HUD = 16
+FS_TITLE = 24
+FS_MED = 18
+FS_SUB = 14
+
 SKY_COLOR = (92, 148, 252)

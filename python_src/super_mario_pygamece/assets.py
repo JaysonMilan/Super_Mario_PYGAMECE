@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import json
+from collections import OrderedDict
 from pathlib import Path
 from typing import Any
 
 import pygame
+
+from .settings import SPRITEBANK_SCALED_CACHE_MAX
 
 
 # Hard overrides applied even when the atlas has the name: the pipe3 sprites
@@ -38,7 +41,7 @@ class SpriteBank:
         self._tile_size = tile_size
         self._atlases: dict[str, pygame.Surface] = {}
         self._sprites: dict[str, tuple[str, pygame.Rect]] = {}
-        self._scaled_cache: dict[tuple[str, int, int], pygame.Surface] = {}
+        self._scaled_cache: OrderedDict[tuple[str, int, int], pygame.Surface] = OrderedDict()
         self._missing: set[str] = set()
         self._load_metadata(metadata_path)
 
@@ -51,12 +54,16 @@ class SpriteBank:
         width, height = size or (self._tile_size, self._tile_size)
         cache_key = (sprite_name, width, height)
         if cache_key in self._scaled_cache:
+            self._scaled_cache.move_to_end(cache_key)
             return self._scaled_cache[cache_key]
 
         atlas_name, rect = self._sprites[sprite_name]
         sprite = self._atlases[atlas_name].subsurface(rect).copy()
         scaled = pygame.transform.scale(sprite, (width, height))
         self._scaled_cache[cache_key] = scaled
+        self._scaled_cache.move_to_end(cache_key)
+        while len(self._scaled_cache) > SPRITEBANK_SCALED_CACHE_MAX:
+            self._scaled_cache.popitem(last=False)
         return scaled
 
     def missing_sprites(self) -> tuple[str, ...]:

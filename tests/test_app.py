@@ -63,8 +63,11 @@ class PygameMarioAppTests(unittest.TestCase):
         app._move_level_selection(-1)
         app._start_selected_level()
 
-        self.assertEqual(app.state, AppState.PLAYING)
+        # Starting a level now shows the intermission screen first.
+        self.assertEqual(app.state, AppState.INTERMISSION)
         self.assertEqual(app.level.meta.name, "1-2")
+        app._end_intermission()
+        self.assertEqual(app.state, AppState.PLAYING)
 
 
 def _fixture_root(name: str) -> Path:

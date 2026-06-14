@@ -51,8 +51,16 @@ LEVEL_THEMES: dict[str, LevelTheme] = {
 }
 
 
-def theme_for(level_name: str) -> LevelTheme:
-    """Pick a theme by level name, with a sensible fallback."""
+def theme_for(level_name: str, level_type: str = "") -> LevelTheme:
+    """Pick a theme, preferring the level JSON's level_type when present."""
+    by_type = {
+        "overworld": OVERWORLD,
+        "underground": UNDERGROUND,
+        "underwater": UNDERWATER,
+        "castle": CASTLE,
+    }.get(level_type.lower())
+    if by_type is not None:
+        return by_type
     if level_name in LEVEL_THEMES:
         return LEVEL_THEMES[level_name]
     lower = level_name.lower()
