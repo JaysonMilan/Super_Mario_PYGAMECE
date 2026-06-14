@@ -1250,12 +1250,18 @@ class GameWorld:
 
     def _update_bowser(self, enemy: Enemy, dt: float) -> None:
         self._update_walker(enemy, dt)
-        if enemy.body.pos.x < enemy.home_x - TILE_SIZE * 3:
+        if enemy.body.pos.x <= enemy.home_x - TILE_SIZE * 3:
             enemy.body.velocity.x = abs(enemy.body.velocity.x or 24.0)  # 0.75 t/s × 32
             enemy.body.facing = 1
-        elif enemy.body.pos.x > enemy.home_x + TILE_SIZE * 3:
+        elif enemy.body.pos.x >= enemy.home_x + TILE_SIZE * 3:
             enemy.body.velocity.x = -abs(enemy.body.velocity.x or 24.0)
             enemy.body.facing = -1
+        else:
+            # C++ updateBowser: in patrol range, face toward the player.
+            desired = 1 if self.player.pos.x >= enemy.body.pos.x else -1
+            if desired != enemy.body.facing:
+                enemy.body.facing = desired
+                enemy.body.velocity.x = desired * 24.0
         # C++ stall prevention: keep Bowser moving if vx was zeroed by tile collision.
         if abs(enemy.body.velocity.x) < 0.1:
             enemy.body.velocity.x = enemy.body.facing * 24.0
