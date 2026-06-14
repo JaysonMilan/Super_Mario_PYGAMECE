@@ -95,6 +95,7 @@ class Enemy:
     combo_timer: float = 0.0  # C++ ComboState::kComboWindow=0.67s; resets streak when it expires
     shell_frames: tuple[str, ...] = ("koopa_shell_feet_0", "koopa_shell_feet_1")
     fireball_hits: int = 0  # Bowser soaks several hits before going down
+    star_immune: bool = False  # C++ star_vulnerable=false (Bowser, Podoboo)
     winged: bool = False  # para-koopas hop; first stomp strips the wings
     stomp_kill: bool = False  # squish-in-place death (Goomba); no physics applied
     # Generic AI scratchpad (different enemies repurpose these fields).

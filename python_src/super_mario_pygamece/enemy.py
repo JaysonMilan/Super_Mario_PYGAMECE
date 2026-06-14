@@ -52,16 +52,16 @@ ENEMY_TRAITS: dict[str, dict[str, Any]] = {
     "GreenKoopa": {"gives_shell": True},
     "RedKoopa": {"gives_shell": True, "ledge_aware": True},
     "BuzzyBeetle": {"gives_shell": True, "fire_immune": True},
-    "Spiny": {"stompable": False, "fire_immune": True, "ledge_aware": True},
+    "Spiny": {"stompable": False, "ledge_aware": True},
     "PiranhaPlant": {"stompable": False, "ai_type": "piranha"},
     "HammerBro": {"ledge_aware": True, "ai_type": "hammerbro"},
-    "Podoboo": {"stompable": False, "fire_immune": True, "ai_type": "podoboo"},
-    "Bowser": {"stompable": False, "ai_type": "bowser"},
-    "BulletBill": {"fire_immune": True, "ai_type": "bullet"},
+    "Podoboo": {"stompable": False, "fire_immune": True, "star_immune": True, "ai_type": "podoboo"},
+    "Bowser": {"stompable": False, "star_immune": True, "ai_type": "bowser"},
+    "BulletBill": {"ai_type": "bullet"},
     "GreenParaKoopa": {"gives_shell": True, "winged": True},
     "RedParaKoopa": {"gives_shell": True, "ledge_aware": True, "winged": True},
-    "Lakitu": {"stompable": False, "fire_immune": True, "ai_type": "lakitu"},
-    "Blooper": {"ai_type": "blooper"},
+    "Lakitu": {"ai_type": "lakitu"},
+    "Blooper": {"stompable": False, "ai_type": "blooper"},
     "CheepCheep": {"ai_type": "cheep"},
 }
 
@@ -128,13 +128,22 @@ def create_enemy(spawn: EntitySpawn) -> Enemy:
     )
     # Initial ai_timer / ai_phase for countdown-based AIs (C++ struct defaults).
     winged = traits.get("winged", False)
-    if ai_type == "hammerbro":
+    initial_home_x = float(pos_x)
+    initial_home_y = float(pos_y)
+    if ai_type == "lakitu":
+        # home_x repurposed as current_lead_distance (px). C++ start = lead_distance_slow = 21/16 t.
+        initial_home_x = 1.3125 * TILE_SIZE
+    elif ai_type == "hammerbro":
         initial_ai_timer = 0.5   # C++ HammerBroBehavior.jump_timer = 0.5f
         initial_ai_phase = 48.0 / 60.0 - 0.6  # throw_timer=0.6f; pre-advance so first throw at 0.6s
     elif ai_type == "bowser":
-        initial_ai_timer = 2.0   # C++ BowserBehavior.jump_timer = 2.0f
-        # C++ fire_timer=1.2f; ai_phase accumulates to 1.8 to fire → pre-advance by 0.6
-        initial_ai_phase = 0.6
+        # C++ EntityFactory: jump_timer = 1.15 + stableSeed*0.12 → [1.15, 1.27]s
+        initial_ai_timer = random.uniform(1.15, 1.27)
+        # C++ fire_timer = 0.90 + stableSeed*0.10 → [0.90, 1.00]s; Python threshold 1.8 → pre-advance = 1.8 - fire_timer
+        initial_ai_phase = random.uniform(0.80, 0.90)
+        # home_y repurposed as hammer_timer countdown (Bowser patrol only uses home_x).
+        # C++ EntityFactory: hammer_timer = 1.20 + stableSeed*0.10 → [1.20, 1.30]s
+        initial_home_y = random.uniform(1.20, 1.30)
     elif ai_type == "podoboo":
         # C++ EntityFactory: cooldown_timer = 0.6 + stableSeed(x,4)*0.2 → range [0.6, 0.8]s
         initial_ai_timer = random.uniform(0.6, 0.8)
@@ -152,12 +161,13 @@ def create_enemy(spawn: EntitySpawn) -> Enemy:
         kind=spawn.type,
         stompable=traits.get("stompable", True),
         fire_immune=traits.get("fire_immune", False),
+        star_immune=traits.get("star_immune", False),
         ledge_aware=traits.get("ledge_aware", False),
         gives_shell=traits.get("gives_shell", False),
         ai_type=ai_type,
         shell_state=ShellState.WALKING,
-        home_x=float(pos_x),
-        home_y=float(pos_y),
+        home_x=initial_home_x,
+        home_y=initial_home_y,
         winged=winged,
         shell_frames=SHELL_FRAMES.get(spawn.type, ("koopa_ded",)),
         ai_timer=initial_ai_timer,

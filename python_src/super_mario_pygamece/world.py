@@ -52,7 +52,6 @@ from .settings import (
     ENEMY_SPEED,
     FIREBALL_COOLDOWN,
     FIREBALL_GRAVITY,
-    FIREBALL_LIFETIME,
     FIREBALL_SPEED,
     FIREBALL_TERMINAL,
     FIREBALL_VBOUNCE,
@@ -508,8 +507,9 @@ class GameWorld:
                         x=self.player.pos.x / TILE_SIZE + random.uniform(-1, 1),
                         y=spawner.spawn_y / TILE_SIZE
                     ))
-                    # Leaping cheeps arc ballistically instead of band-swimming.
+                    # Leaping cheeps arc ballistically; C++ SpawnedCheep stompable=false.
                     new_cheep.ai_type = "cheep_spawned"
+                    new_cheep.stompable = False
                     h_dir = random.choice([-1, 1])
                     new_cheep.body.velocity = pygame.Vector2(h_dir * 1.875 * TILE_SIZE, 0.0)
                     new_cheep.ai_timer = 11.0   # jump_distance budget in tiles (C++ SpawnedCheepBehavior default)
@@ -1015,10 +1015,9 @@ class GameWorld:
                 enemy.body.facing = -enemy.body.facing
 
     def _update_piranha(self, enemy: Enemy, dt: float) -> None:
-        # 4-second cycle: 1s rising, 1.2s emerged, 1s falling, 0.8s hidden.
-        # Cycle pauses (or restarts at hidden phase) when Mario is too close.
+        # C++ rise: hidden_y=y+0.5t → emerged_y=y-1.0t, travel=1.5t.
         cycle_speed = 60.0  # C++ move_speed = 30/16 t/s × 32 = 60 px/s
-        rise_distance = TILE_SIZE * 2
+        rise_distance = 1.5 * TILE_SIZE  # C++ travel distance = 1.5 tiles = 48 px
         player_dx = abs(self.player.pos.x - enemy.home_x)
         # SMB1 gate: rise only when Mario is at least ~2 tiles away (0x21 px).
         retract_threshold = TILE_SIZE * 2.06
@@ -1153,23 +1152,53 @@ class GameWorld:
             enemy.alive = False
 
     def _update_lakitu(self, enemy: Enemy, dt: float) -> None:
-        # Vertical bob: C++ sin(bob_timer * 2.5) * 0.25t = 8 px; lerp coeff 0.12/frame × 60fps.
-        enemy.ai_phase += dt  # bob_timer accumulator
+        # Vertical bob: C++ sin(bob_timer * 2.5) * 0.25t; lerp coeff 0.12/frame = 7.2/s.
+        enemy.ai_phase += dt
         bob_target_y = enemy.home_y + math.sin(enemy.ai_phase * 2.5) * 8.0
         enemy.body.pos.y += (bob_target_y - enemy.body.pos.y) * min(1.0, dt * 7.2)
 
-        # Follow player with a lead. C++ LakituBehavior: max_follow_speed=11.0 t/s.
-        _MAX_FOLLOW = 11.0 * TILE_SIZE   # 352 px/s
-        target_x = self.player.pos.x + 2.5 * TILE_SIZE  # ~lead_distance_medium ahead
-        diff = target_x - enemy.body.pos.x
-        desired_vx = max(-_MAX_FOLLOW, min(_MAX_FOLLOW, diff * 2.5))
-        # C++ smooth blend: vel.vx += (desired - vel.vx) * min(1, dt*12)
+        # Speed-based lead distance: slow=1.3125t, medium=3.0t, fast=4.0t (C++ LakituBehavior).
+        # home_x stores current_lead_distance in pixels (initialized to lead_distance_slow).
+        player_speed_t = abs(self.player.velocity.x) / TILE_SIZE
+        _LEAD_SLOW   = 1.3125 * TILE_SIZE
+        _LEAD_MEDIUM = 3.0 * TILE_SIZE
+        _LEAD_FAST   = 4.0 * TILE_SIZE
+        slow_t = min(1.0, player_speed_t / 1.0)
+        fast_t = min(1.0, max(0.0, (player_speed_t - 1.0) / 3.0))
+        target_lead = _LEAD_SLOW + (_LEAD_MEDIUM - _LEAD_SLOW) * slow_t + (_LEAD_FAST - _LEAD_MEDIUM) * fast_t
+        enemy.home_x += (target_lead - enemy.home_x) * min(1.0, dt * 4.0)
+
+        # Follow side: which direction the player is moving (with threshold hysteresis).
+        if self.player.velocity.x > 0.2 * TILE_SIZE:
+            follow_side = 1
+        elif self.player.velocity.x < -0.2 * TILE_SIZE:
+            follow_side = -1
+        else:
+            follow_side = 1 if self.player.pos.x >= enemy.body.pos.x else -1
+
+        target_x = self.player.pos.x + follow_side * enemy.home_x
+        dx = target_x - enemy.body.pos.x
+        abs_dx = abs(dx)
+
+        # Travel speed: blend base and catchup proportional to overshoot (C++ LakituBehavior).
+        _DEAD_ZONE = 0.18 * TILE_SIZE       # 5.76 px — stop jittering within dead zone
+        _CATCHUP_DIST = 4.0 * TILE_SIZE     # full catchup at ≥4t overshoot
+        _MAX_FOLLOW = 11.0 * TILE_SIZE      # 352 px/s cap
+        if abs_dx > _DEAD_ZONE:
+            base_speed   = max(2.2 * TILE_SIZE, abs(self.player.velocity.x) + 0.8 * TILE_SIZE)
+            catchup_speed = max(8.0 * TILE_SIZE, abs(self.player.velocity.x) + 2.0 * TILE_SIZE)
+            catchup_t = min(1.0, max(0.0, (abs_dx - TILE_SIZE) / (_CATCHUP_DIST - TILE_SIZE)))
+            travel_speed = min(base_speed + (catchup_speed - base_speed) * catchup_t, _MAX_FOLLOW)
+            desired_vx = travel_speed if dx > 0 else -travel_speed
+        else:
+            desired_vx = 0.0
         enemy.body.velocity.x += (desired_vx - enemy.body.velocity.x) * min(1.0, dt * 12.0)
         enemy.body.facing = -1 if self.player.pos.x < enemy.body.pos.x else 1
         enemy.body.pos.x += enemy.body.velocity.x * dt
-        # Drop a Spiny periodically (countdown equivalent via accumulator).
+
+        # Throw spiny egg periodically (C++ frenzy_interval = 128/60 ≈ 2.13s).
         enemy.ai_timer += dt
-        if enemy.ai_timer > 128.0 / 60.0:  # C++ frenzy_interval = 128/60 ≈ 2.13 s
+        if enemy.ai_timer > 128.0 / 60.0:
             enemy.ai_timer = 0.0
             self._spawn_spiny_drop(enemy)
 
@@ -1182,18 +1211,19 @@ class GameWorld:
         spawn_y = (lakitu.body.pos.y + 0.55 * TILE_SIZE) / TILE_SIZE
         spiny = create_enemy(EntitySpawn(type="Spiny", x=spawn_x, y=spawn_y))
         spiny.frames = ("spikey1_0", "spikey1_1")
-        spiny.body.velocity.update(direction * 1.7 * TILE_SIZE, 0.0)
+        spiny.body.velocity.update(direction * 1.7 * TILE_SIZE, -2.0 * TILE_SIZE)  # C++ vel.vy = -2.0 t/s
         spiny.ai_timer = 1.4   # C++ hatch_timer = 1.4f
         spiny.home_x = float(direction)  # direction preserved for egg-phase velocity
         self.enemies.append(spiny)
 
     def _update_hammerbro(self, enemy: Enemy, dt: float) -> None:
-        # Reuses walker physics but limits horizontal range to ~3 tiles around home_x.
+        # C++ shimmy: direction reverses every ~64/60s. Effective amplitude ≈ 0.59t per leg.
+        # Clamping to ±0.65t around home_x approximates this without a separate timer field.
         self._update_walker(enemy, dt)
-        if enemy.body.pos.x < enemy.home_x - TILE_SIZE * 2:
+        if enemy.body.pos.x < enemy.home_x - 0.65 * TILE_SIZE:
             enemy.body.velocity.x = abs(enemy.body.velocity.x or 17.6)  # 0.55 t/s × 32
             enemy.body.facing = 1
-        elif enemy.body.pos.x > enemy.home_x + TILE_SIZE * 2:
+        elif enemy.body.pos.x > enemy.home_x + 0.65 * TILE_SIZE:
             enemy.body.velocity.x = -abs(enemy.body.velocity.x or 17.6)
             enemy.body.facing = -1
         # Periodic jump (countdown timer; C++ jump_interval [0.9, 1.4]s).
@@ -1203,12 +1233,13 @@ class GameWorld:
             js = (12.5 if random.random() < 0.22 else 8.5) * TILE_SIZE
             enemy.body.velocity.y = -js
             enemy.ai_timer = random.uniform(0.9, 1.4)
-        # Periodic hammer throw aimed roughly at the player.
+        # Periodic hammer throw (C++ throw_interval = 48/60s, no distance gate).
         enemy.ai_phase += dt
         if enemy.ai_phase > 48.0 / 60.0:  # C++ throw_interval = 48/60 s
-            enemy.ai_phase = 0.0
-            if abs(self.player.pos.x - enemy.body.pos.x) < SCREEN_SIZE[0] * 0.7:
-                self._throw_hammer(enemy)
+            enemy.ai_phase -= 48.0 / 60.0 + random.uniform(-6.0 / 60.0, 10.0 / 60.0)
+            if enemy.ai_phase < 0.0:
+                enemy.ai_phase = 0.0
+            self._throw_hammer(enemy)
 
     def _update_bowser(self, enemy: Enemy, dt: float) -> None:
         self._update_walker(enemy, dt)
@@ -1218,24 +1249,37 @@ class GameWorld:
         elif enemy.body.pos.x > enemy.home_x + TILE_SIZE * 3:
             enemy.body.velocity.x = -abs(enemy.body.velocity.x or 24.0)
             enemy.body.facing = -1
+        # C++ stall prevention: keep Bowser moving if vx was zeroed by tile collision.
+        if abs(enemy.body.velocity.x) < 0.1:
+            enemy.body.velocity.x = enemy.body.facing * 24.0
         enemy.ai_timer -= dt
         if enemy.body.on_ground and enemy.ai_timer <= 0:  # C++ jump_interval [1.5, 2.8]s
             enemy.body.velocity.y = -304.0  # C++ jump_speed = 9.5 t/s × 32
             enemy.ai_timer = random.uniform(1.5, 2.8)
-        # Bowser breathes fire. C++: random interval [1.5,2.9]s, max 1 active fire.
+        # Bowser breathes fire. C++: unconditional (no distance gate), max 1 active fire.
         enemy.ai_phase += dt
-        if enemy.ai_phase > 1.8 and abs(self.player.pos.x - enemy.body.pos.x) < SCREEN_SIZE[0] * 0.9:
+        if enemy.ai_phase > 1.8:
             active_fires = sum(1 for p in self.enemy_projectiles if p.kind == "bowserfire" and p.alive)
             if active_fires < 1:  # C++ kMaxActiveBowserFireProjectiles = 1
                 enemy.ai_phase = 1.8 - random.uniform(1.5, 2.9)  # C++ fire_interval [1.5,2.9]s
                 self._spawn_bowser_fire(enemy)
+        # C++ enable_hammers=true, hard_mode hammer_interval=1.4s. home_y = hammer_timer countdown.
+        enemy.home_y -= dt
+        if enemy.home_y <= 0:
+            interval = 1.4 + random.uniform(-10.0 / 60.0, 8.0 / 60.0)
+            enemy.home_y = max(28.0 / 60.0, interval)
+            self._throw_bowser_hammer(enemy)
 
     # ----------------------------------------------------------- enemy attacks
     def _throw_hammer(self, enemy: Enemy) -> None:
+        # C++ HammerBroBehavior: spawn at pos + 0.30t*dir horizontal, -0.45t vertical.
         direction = -1 if self.player.pos.x < enemy.body.pos.x else 1
         self.enemy_projectiles.append(
             EnemyProjectile(
-                pos=pygame.Vector2(enemy.body.pos.x + (16 if direction > 0 else -8), enemy.body.pos.y - 16),
+                pos=pygame.Vector2(
+                    enemy.body.pos.x + 0.30 * TILE_SIZE * direction,
+                    enemy.body.pos.y - 0.45 * TILE_SIZE,
+                ),
                 velocity=pygame.Vector2(direction * 121.6, -262.4),  # C++ vx=3.8 t/s, vy=-8.2 t/s
                 kind="hammer",
                 affected_by_gravity=True,
@@ -1243,13 +1287,30 @@ class GameWorld:
             )
         )
 
-    def _spawn_bowser_fire(self, enemy: Enemy) -> None:
+    def _throw_bowser_hammer(self, enemy: Enemy) -> None:
+        # C++ BowserBehavior: spawn at pos + 0.45t*dir horizontal, -0.8t vertical.
         direction = -1 if self.player.pos.x < enemy.body.pos.x else 1
         self.enemy_projectiles.append(
             EnemyProjectile(
                 pos=pygame.Vector2(
-                    enemy.body.pos.x + (enemy.body.size.x if direction > 0 else -16),
-                    enemy.body.pos.y + enemy.body.size.y * 0.4,
+                    enemy.body.pos.x + 0.45 * TILE_SIZE * direction,
+                    enemy.body.pos.y - 0.8 * TILE_SIZE,
+                ),
+                velocity=pygame.Vector2(direction * 121.6, -262.4),  # same arc as HammerBro
+                kind="hammer",
+                affected_by_gravity=True,
+                lifetime=4.0,
+            )
+        )
+
+    def _spawn_bowser_fire(self, enemy: Enemy) -> None:
+        # C++ BowserBehavior: spawn at pos + 0.65t*dir horizontal, -0.2t vertical.
+        direction = -1 if self.player.pos.x < enemy.body.pos.x else 1
+        self.enemy_projectiles.append(
+            EnemyProjectile(
+                pos=pygame.Vector2(
+                    enemy.body.pos.x + 0.65 * TILE_SIZE * direction,
+                    enemy.body.pos.y - 0.2 * TILE_SIZE,
                 ),
                 velocity=pygame.Vector2(direction * 120.0, 0.0),  # C++ kBowserFireSpeed = 3.75 t/s × 32
                 kind="bowserfire",
@@ -1289,18 +1350,6 @@ class GameWorld:
                 kept.append(proj)
         self.enemy_projectiles = kept
 
-        # Player-fireball vs enemy-projectile (Mario's fireball can clear hammers).
-        for fb in self.fireballs:
-            if not fb.alive:
-                continue
-            for proj in self.enemy_projectiles:
-                if proj.alive and fb.rect.colliderect(proj.rect):
-                    proj.alive = False
-                    fb.alive = False
-                    fb.explode_timer = 0.15
-                    self.score += 50
-                    break
-
     def _update_fireballs(self, dt: float) -> None:
         kept: list[Fireball] = []
         for fireball in self.fireballs:
@@ -1328,12 +1377,10 @@ class GameWorld:
                         fireball.pos.y = tile.top - fireball.rect.height
                         fireball.velocity.y = -FIREBALL_VBOUNCE
                     else:
+                        # C++ TileCollisionSystem: ceiling just snaps position, no dampen.
                         fireball.pos.y = tile.bottom
-                        fireball.velocity.y = abs(fireball.velocity.y) * 0.5
-            if fireball.age > FIREBALL_LIFETIME:
-                fireball.alive = False
-                fireball.explode_timer = 0.1
-            elif fireball.pos.x < self.camera_x - 80 or fireball.pos.x > self.camera_x + SCREEN_SIZE[0] + 80:
+                        fireball.velocity.y = 0.0
+            if fireball.pos.x < self.camera_x - 80 or fireball.pos.x > self.camera_x + SCREEN_SIZE[0] + 80:
                 fireball.alive = False
                 fireball.explode_timer = 0.0
             else:
@@ -1494,8 +1541,8 @@ class GameWorld:
     def _handle_entity_collisions(self) -> None:
         player_rect = self.player.rect
 
-        # Hazards
-        if self.player.invincible_timer <= 0:
+        # Hazards — C++ checks power.invincible, which covers both regular and star immunity
+        if self.player.invincible_timer <= 0 and self.player.star_timer <= 0:
             for fire in self.upfires:
                 if fire.state != 0 and player_rect.colliderect(fire.rect):
                     self._take_damage()
@@ -1514,13 +1561,14 @@ class GameWorld:
                 and player_rect.bottom <= enemy.body.rect.centery + 8
             )
 
-            # Star power: Mario kills anything he touches.
+            # Star power: kills most enemies; Bowser/Podoboo are star_immune (C++ star_vulnerable=false).
             if self.player.star_timer > 0:
-                self._kill_enemy(enemy, score=0, popup_x=enemy.body.rect.x, popup_y=enemy.body.rect.y,
-                                 launch_vy=-320.0)  # C++ markEnemyHitDeath -10 t/s
-                self._award_combo_score(enemy.body.rect.x, enemy.body.rect.y)
-                self.events.append("kick")
-                continue
+                if not enemy.star_immune:
+                    self._kill_enemy(enemy, score=0, popup_x=enemy.body.rect.x, popup_y=enemy.body.rect.y,
+                                     launch_vy=-320.0)  # C++ markEnemyHitDeath -10 t/s
+                    self._award_combo_score(enemy.body.rect.x, enemy.body.rect.y)
+                    self.events.append("kick")
+                continue  # star Mario is always immune to damage, even from immune enemies
 
             # Shell-state collisions take priority over walker collisions.
             if enemy.shell_state is ShellState.SHELL_STILL:
@@ -1699,7 +1747,6 @@ class GameWorld:
                 self.player.velocity.update(0.0, 0.0)
                 self.events.append("bridgebreak")
                 self.events.append("bowserfall")
-                self.score += 1000
                 self._enter_complete()
                 return
 
@@ -1763,7 +1810,6 @@ class GameWorld:
         self.complete_timer += dt
         self.player.pos.x += 176.0 * dt  # C++ kWalkSpeed = 5.5 t/s × 32
         if self.complete_timer >= 1.6:  # C++ kWalkDuration = 1.6s
-            self.score += 1000  # base completion bonus
             self._enter_complete()
 
     def _enter_gameover(self) -> None:
