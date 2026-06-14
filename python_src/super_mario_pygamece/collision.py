@@ -105,6 +105,7 @@ def handle_entity_collisions(world: CollisionWorld) -> None:
                 enemy.shell_wake_timer = SHELL_WAKE_TIME
                 enemy.body.velocity.update(0.0, 0.0)
                 enemy.kick_streak = 0
+                world.events.append("stomp")  # C++ enterStationaryShell → PlaySoundEvent "stomp"
             elif enemy.kick_grace <= 0 and world.player.invincible_timer <= 0:
                 world._take_damage()
                 return
