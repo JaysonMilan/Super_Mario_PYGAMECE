@@ -1164,7 +1164,6 @@ class GameWorld:
         self.player.is_shrinking = True
         self.player.shrink_timer = 0.0
         self.player.pending_state = shrink_to
-        self._apply_state_change(shrink_to)
         self.player.invincible_timer = INVINCIBILITY_TIME
         self.events.append("shrink")
 
@@ -1208,15 +1207,17 @@ class GameWorld:
         self.events.append("complete")
 
     def _begin_flagpole_slide(self, goal: pygame.Rect, dt: float) -> None:
-        pole_top_px = float(goal.top)
-        pole_height_px = float(goal.height)
-        player_y = float(self.player.pos.y - self.player.velocity.y * dt)
-        frac = max(0.0, min(1.0, 1.0 - (player_y - pole_top_px) / pole_height_px))
+        # C++ MarioGame: kPoleHeight=10t, frac=clamp(1-(y-pole_top)/10t, 0,1)
+        # kBonusTable={100,200,500,1000,2000,5000}, bonus_idx=int(frac*5) clamped [0,5].
+        pole_bottom_px = float(goal.bottom)
+        pole_height_px = 10.0 * TILE_SIZE  # C++ kPoleHeight = 10 tiles
+        pole_top_px = pole_bottom_px - pole_height_px
+        player_center_y = self.player.pos.y + self.player.size.y * 0.5
+        frac = max(0.0, min(1.0, 1.0 - (player_center_y - pole_top_px) / pole_height_px))
         bonus_table = (100, 200, 500, 1000, 2000, 5000)
         bonus_idx = min(int(frac * 5.0), 5)
         bonus = bonus_table[bonus_idx]
         self.score += bonus
-        self.score += 1000
         self._popup(str(bonus), int(self.player.pos.x), int(self.player.pos.y))
         self.player.velocity.update(0.0, 0.0)
         # Snap Mario to the side of the pole.

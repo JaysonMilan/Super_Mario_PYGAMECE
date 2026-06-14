@@ -6,8 +6,8 @@ from .entities import Player, PowerState
 from .settings import TILE_SIZE
 
 
-SMALL_SIZE = pygame.Vector2(28, 30)
-BIG_SIZE = pygame.Vector2(28, 60)
+SMALL_SIZE = pygame.Vector2(26, 32)   # C++: AABB 0.8t × 1.0t = 25.6×32 px
+BIG_SIZE = pygame.Vector2(26, 64)     # C++: AABB 0.8t × 2.0t = 25.6×64 px
 
 
 def create_player(spawn_x_tiles: float = 3.0, spawn_y_tiles: float = 13.0) -> Player:
