@@ -1773,10 +1773,12 @@ class GameWorld:
                 self.axe_rects.remove(axe)
                 for enemy in self.enemies:
                     if enemy.kind == "Bowser" and enemy.alive:
-                        self._kill_enemy(enemy, score=5000, popup_x=enemy.body.rect.x, popup_y=enemy.body.rect.y)
+                        # C++ knockBowserIntoDefeat: vx=-1.5 t/s, vy=-11.0 t/s; awards 5000; no "bowserfall" sound.
+                        self._kill_enemy(enemy, score=5000, popup_x=enemy.body.rect.x, popup_y=enemy.body.rect.y,
+                                         launch_vy=-11.0 * TILE_SIZE)
+                        enemy.body.velocity.x = -1.5 * TILE_SIZE
                 self.player.velocity.update(0.0, 0.0)
-                self.events.append("bridgebreak")
-                self.events.append("bowserfall")
+                self.events.append("bridgebreak")  # C++ triggerCastleAxeSequence: only "bridgebreak"
                 self._enter_complete()
                 return
 
