@@ -93,7 +93,8 @@ def handle_entity_collisions(world: CollisionWorld) -> None:
         if enemy.shell_state is ShellState.SHELL_STILL:
             if from_above:
                 world.player.velocity.y = -19.0 * TILE_SIZE  # C++ stomp_bounce = 19.0 t/s × 32
-                world._kick_shell(enemy, direction=1 if world.player.facing >= 0 else -1)
+                # C++ kickShell: direction = (player_x < enemy_x) ? 1 : -1 (kick away from player)
+                world._kick_shell(enemy, direction=1 if world.player.pos.x < enemy.body.pos.x else -1)
             else:
                 world._kick_shell(enemy, direction=1 if world.player.pos.x < enemy.body.pos.x else -1)
             continue
