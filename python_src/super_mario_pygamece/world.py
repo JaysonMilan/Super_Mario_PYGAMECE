@@ -1,13 +1,14 @@
 from __future__ import annotations
 
-import math
 import random
 from enum import Enum
 from typing import Protocol
 
 import pygame
 
-from .enemy import ENEMY_DEAD_FRAMES, ENEMY_FRAMES, create_enemy, is_enemy_spawn
+from . import collision as collision_logic
+from . import enemy_ai
+from .enemy import ENEMY_FRAMES, create_enemy, is_enemy_spawn
 from .entities import (
     BlockBump,
     CheepSpawner,
@@ -330,6 +331,17 @@ class GameWorld:
         self.on_platform = None
         self.camera_x = max(0.0, self.player.rect.centerx - SCREEN_SIZE[0] * 0.5)
         self.camera_y = self._static_camera_y()
+        self._enemy_ai_handlers = {
+            "piranha": self._update_piranha,
+            "bullet": self._update_bullet,
+            "lakitu": self._update_lakitu,
+            "hammerbro": self._update_hammerbro,
+            "bowser": self._update_bowser,
+            "blooper": self._update_blooper,
+            "cheep": self._update_cheep,
+            "cheep_spawned": self._update_cheep_spawned,
+            "podoboo": self._update_podoboo,
+        }
 
     def _static_camera_y(self) -> float:
         """Vertical framing, mirroring SDL3 getCameraPosition (static per level)."""
@@ -465,7 +477,7 @@ class GameWorld:
         self._update_collectibles(dt)
         self._update_hazards(dt)
         self._handle_entity_collisions()
-        self._handle_goal()
+        self._handle_goal(dt)
         self._tick_effects(dt)
         self._update_camera(dt)
 
@@ -521,108 +533,10 @@ class GameWorld:
 
     # --------------------------------------------------------------- rendering
     def _update_platforms(self, dt: float) -> None:
-        # Moving Platforms — C++ MovingPlatformSystem (bounce/ping-pong, half-speed near endpoints)
-        for p in self.moving_platforms:
-            old_pos = pygame.Vector2(p.pos)
-            dist = p.start_pos.distance_to(p.end_pos)
-            if dist > 0:
-                effective_speed = p.speed
-                if p.ease_endpoints and p.ease_distance > 0.0:
-                    t_ease = (p.ease_distance * TILE_SIZE) / dist
-                    if p.t < t_ease or (1.0 - p.t) < t_ease:
-                        effective_speed *= 0.5
-
-                prev_t = p.t
-                p.t += (effective_speed / dist) * dt * p.direction
-                if p.t >= 1.0:
-                    p.t = 1.0
-                    p.direction = -1
-                elif p.t <= 0.0:
-                    p.t = 0.0
-                    p.direction = 1
-
-                p.pos = p.start_pos.lerp(p.end_pos, p.t)
-
-            p.delta_pos = p.pos - old_pos
-
-        # Falling Platforms: C++ FallingPlatformSystem — constant fall_speed while player is on top.
-        for p in self.falling_platforms:
-            old_pos = pygame.Vector2(p.pos)
-            if p.has_player:
-                p.pos.y += p.fall_speed * dt  # constant speed (not accelerating)
-            p.delta_pos = p.pos - old_pos
-
-        # Seesaw Platforms
-        processed_seesaws = set()
-        for i, p in enumerate(self.seesaw_platforms):
-            if i in processed_seesaws:
-                continue
-            partner = self.seesaw_platforms[p.partner_idx]
-            processed_seesaws.add(i)
-            processed_seesaws.add(p.partner_idx)
-
-            old_pos_p = pygame.Vector2(p.pos)
-            old_pos_partner = pygame.Vector2(partner.pos)
-
-            if p.falling:
-                p.pos.y += p.fall_speed * dt
-                partner.pos.y += partner.fall_speed * dt
-            else:
-                if p.has_player and not partner.has_player:
-                    move = p.tilt_speed * dt
-                    p.pos.y += move
-                    partner.pos.y -= move
-                elif not p.has_player and partner.has_player:
-                    move = partner.tilt_speed * dt
-                    partner.pos.y += move
-                    p.pos.y -= move
-                
-                if abs(p.pos.y - p.y_neutral) > p.drop_threshold:
-                    p.falling = True
-                    partner.falling = True
-
-            p.delta_pos = p.pos - old_pos_p
-            partner.delta_pos = partner.pos - old_pos_partner
+        collision_logic.update_platforms(self, dt)
 
     def _handle_platform_collisions(self) -> None:
-        player_rect = self.player.rect
-        # We only check for landing on a platform if we are falling or already on one.
-        # But specifically, if the player's feet are just above the platform.
-        
-        # Reset has_player for all platforms
-        for p in self.falling_platforms: p.has_player = False
-        for p in self.seesaw_platforms: p.has_player = False
-        
-        new_on_platform = None
-        
-        # Check all platforms
-        all_platforms = (
-            *self.moving_platforms,
-            *self.falling_platforms,
-            *self.seesaw_platforms,
-        )
-        
-        for p in all_platforms:
-            plat_rect = p.rect
-            # Check if player is above and moving down (or already on it)
-            if (self.player.velocity.y >= 0 and 
-                player_rect.right > plat_rect.left and 
-                player_rect.left < plat_rect.right and
-                player_rect.bottom <= plat_rect.top + 10 and
-                player_rect.bottom >= plat_rect.top - 5):
-                
-                # Snap to top
-                self.player.pos.y = plat_rect.top - self.player.size.y
-                self.player.velocity.y = 0
-                self.player.on_ground = True
-                new_on_platform = p
-                
-                # Set specific state
-                if isinstance(p, (FallingPlatform, SeesawPlatform)):
-                    p.has_player = True
-                break
-        
-        self.on_platform = new_on_platform
+        collision_logic.handle_platform_collisions(self)
 
     def player_frame(self) -> str:
         if self.state is WorldState.DYING:
@@ -736,6 +650,9 @@ class GameWorld:
             self.coyote_timer = 0.0
             self.jump_buffer_timer = 0.0
             self.events.append("jumpbig" if self.player.state is not PowerState.SMALL else "jump")
+
+        if jump_released and self.player.velocity.y < 0:
+            self.player.velocity.y *= 0.5
 
         # Fireball
         if self.player.fire_cooldown > 0:
@@ -907,27 +824,8 @@ class GameWorld:
             enemy.age += dt
             if enemy.kick_grace > 0:
                 enemy.kick_grace = max(0.0, enemy.kick_grace - dt)
-            ai = enemy.ai_type
-            if ai == "piranha":
-                self._update_piranha(enemy, dt)
-            elif ai == "bullet":
-                self._update_bullet(enemy, dt)
-            elif ai == "lakitu":
-                self._update_lakitu(enemy, dt)
-            elif ai == "hammerbro":
-                self._update_hammerbro(enemy, dt)
-            elif ai == "bowser":
-                self._update_bowser(enemy, dt)
-            elif ai == "blooper":
-                self._update_blooper(enemy, dt)
-            elif ai == "cheep":
-                self._update_cheep(enemy, dt)
-            elif ai == "cheep_spawned":
-                self._update_cheep_spawned(enemy, dt)
-            elif ai == "podoboo":
-                self._update_podoboo(enemy, dt)
-            else:
-                self._update_walker(enemy, dt)
+            handler = self._enemy_ai_handlers.get(enemy.ai_type, self._update_walker)
+            handler(enemy, dt)
 
             if enemy.body.pos.y > self.level.meta.height * TILE_SIZE + 200:
                 enemy.alive = False
@@ -964,404 +862,49 @@ class GameWorld:
         self.enemies = [e for e in self.enemies if e.alive or e.death_timer > 0]
 
     def _update_walker(self, enemy: Enemy, dt: float) -> None:
-        # Lakitu egg hatches into a Spiny on landing or after 1.4s (C++ hatch_timer).
-        if enemy.frames and enemy.frames[0] == "spikey1_0":
-            enemy.ai_timer -= dt
-            if enemy.body.on_ground or enemy.ai_timer <= 0:
-                enemy.frames = ("spikey0_0", "spikey0_1")
-                enemy.body.velocity.x = -1.2 * TILE_SIZE  # C++ Spiny: walk_speed=1.2, direction=-1
-            else:
-                # C++ LakituEgg: horizontal_speed=1.7 t/s toward player while falling.
-                enemy.body.velocity.x = enemy.home_x * 1.7 * TILE_SIZE
-
-        # Wake up sleeping shells.
-        if enemy.shell_state is ShellState.SHELL_STILL:
-            enemy.shell_wake_timer -= dt
-            if enemy.shell_wake_timer <= 0:
-                self._wake_shell(enemy)
-
-        # Para-koopas hop every 1.2s while grounded (SDL3 KoopaWingedBehavior).
-        if enemy.winged and enemy.body.on_ground:
-            enemy.ai_timer -= dt
-            if enemy.ai_timer <= 0:
-                enemy.ai_timer = 1.1  # C++ EntityFactory: KoopaWingedBehavior.jump_interval = 1.1s
-                enemy.body.velocity.y = -8.2 * TILE_SIZE  # C++ EntityFactory override: 8.2 t/s
-
-        before_x = enemy.body.pos.x
-        before_vx = enemy.body.velocity.x
-        # C++ GravitySystem: rising entities use gravity_rising=55 t/s², falling uses gravity_falling=80 t/s²
-        _egrav = GRAVITY_RISING if enemy.body.velocity.y < 0 else GRAVITY
-        enemy.body.velocity.y = min(enemy.body.velocity.y + _egrav * dt, MAX_FALL_SPEED)
-        self.collider.move_and_collide(enemy.body, dt)
-
-        # Wall contact: bounce shells, turn around walkers.
-        if abs(enemy.body.pos.x - before_x) < 0.01 and abs(before_vx) > 1.0:
-            if enemy.shell_state is ShellState.SHELL_KICKED:
-                enemy.body.velocity.x = -before_vx
-                enemy.body.facing = -enemy.body.facing
-                self.events.append("blockhit")
-            else:
-                enemy.body.velocity.x = -before_vx if before_vx else -enemy.body.facing * 70.0
-                enemy.body.facing = -enemy.body.facing
-
-        # Ledge-aware turn (only walking enemies that opt in).
-        if (
-            enemy.ledge_aware
-            and enemy.shell_state is ShellState.WALKING
-            and enemy.body.on_ground
-            and enemy.body.velocity.x
-        ):
-            probe_x = (
-                enemy.body.rect.right
-                if enemy.body.velocity.x > 0
-                else enemy.body.rect.left - 2
-            )
-            probe = pygame.Rect(int(probe_x), int(enemy.body.rect.bottom), 2, 4)
-            if not any(probe.colliderect(tile) for tile in self.collider.nearby(probe)):
-                enemy.body.velocity.x = -enemy.body.velocity.x
-                enemy.body.facing = -enemy.body.facing
+        enemy_ai.update_walker(self, enemy, dt)
 
     def _update_piranha(self, enemy: Enemy, dt: float) -> None:
-        # C++ rise: hidden_y=y+0.5t → emerged_y=y-1.0t, travel=1.5t.
-        cycle_speed = 60.0  # C++ move_speed = 30/16 t/s × 32 = 60 px/s
-        rise_distance = 1.5 * TILE_SIZE  # C++ travel distance = 1.5 tiles = 48 px
-        player_dx = abs(self.player.pos.x - enemy.home_x)
-        # SMB1 gate: rise only when Mario is at least ~2 tiles away (0x21 px).
-        retract_threshold = TILE_SIZE * 2.06
-        enemy.ai_timer += dt
-        # Phases: 0=hidden, 1=rising, 2=emerged, 3=falling
-        if enemy.ai_phase == 0:
-            if enemy.ai_timer > 64.0 / 60.0 and player_dx > retract_threshold:  # C++ pause_duration
-                enemy.ai_phase = 1
-                enemy.ai_timer = 0.0
-        elif enemy.ai_phase == 1:
-            enemy.body.pos.y -= cycle_speed * dt
-            if enemy.home_y - enemy.body.pos.y >= rise_distance:
-                enemy.body.pos.y = enemy.home_y - rise_distance
-                enemy.ai_phase = 2
-                enemy.ai_timer = 0.0
-        elif enemy.ai_phase == 2:
-            if enemy.ai_timer > 64.0 / 60.0:  # C++ pause_duration
-                enemy.ai_phase = 3
-                enemy.ai_timer = 0.0
-        elif enemy.ai_phase == 3:
-            enemy.body.pos.y += cycle_speed * dt
-            if enemy.body.pos.y >= enemy.home_y:
-                enemy.body.pos.y = enemy.home_y
-                enemy.ai_phase = 0
-                enemy.ai_timer = 0.0
+        enemy_ai.update_piranha(self, enemy, dt)
 
     def _update_blooper(self, enemy: Enemy, dt: float) -> None:
-        # SDL3 BlooperBehavior: pulse up toward Mario, hover, drift back down.
-        # Phases via ai_phase: 0=diving, 1=rising, 2=gliding. home_y = origin.
-        rise_speed = 1.5 * TILE_SIZE
-        dive_speed = 0.65 * TILE_SIZE
-        h_speed = 0.45 * TILE_SIZE
-        upper = enemy.home_y - 0.9375 * TILE_SIZE
-        if enemy.ai_phase == 1:  # rising — track the player horizontally
-            enemy.frames = ("squid0",)  # C++: contracted squid during rising
-            enemy.body.velocity.update(enemy.body.facing * h_speed, -rise_speed)
-            enemy.ai_timer -= dt
-            if enemy.ai_timer <= 0:  # retarget toward Mario every 0.35s
-                enemy.ai_timer = 0.35
-                enemy.body.facing = -1 if self.player.pos.x < enemy.body.pos.x else 1
-            if enemy.body.pos.y <= upper:
-                enemy.ai_phase = 2
-                enemy.ai_timer = 0.5
-        elif enemy.ai_phase == 2:  # gliding at the peak
-            enemy.frames = ("squid1",)  # C++: open squid during gliding
-            enemy.body.velocity.update(enemy.body.facing * h_speed * 0.25, 0.0)
-            enemy.ai_timer -= dt
-            if enemy.ai_timer <= 0:
-                enemy.ai_phase = 0
-        else:  # diving
-            enemy.frames = ("squid1",)  # C++: open squid during diving
-            enemy.body.velocity.update(enemy.body.facing * h_speed * 0.2, dive_speed)
-            if enemy.body.pos.y >= enemy.home_y:
-                enemy.ai_phase = 1
-                enemy.ai_timer = 0.0
-        enemy.body.pos += enemy.body.velocity * dt
+        enemy_ai.update_blooper(self, enemy, dt)
 
     def _update_cheep(self, enemy: Enemy, dt: float) -> None:
-        # SDL3 FlyingCheepCheepBehavior: swim sideways inside a vertical band.
-        h_speed = 1.8 * TILE_SIZE
-        v_speed = 1.05 * TILE_SIZE
-        span = 30.0
-        if enemy.body.pos.y <= enemy.home_y - span:
-            enemy.ai_phase = 1  # moving down
-        elif enemy.body.pos.y >= enemy.home_y + span:
-            enemy.ai_phase = 0  # moving up
-        enemy.body.velocity.x = enemy.body.facing * h_speed
-        enemy.body.velocity.y = v_speed if enemy.ai_phase == 1 else -v_speed
-        enemy.body.pos += enemy.body.velocity * dt
+        enemy_ai.update_cheep(self, enemy, dt)
 
     def _update_cheep_spawned(self, enemy: Enemy, dt: float) -> None:
-        # C++ SpawnedCheepBehavior: stepped speed table, no gravity, despawn at y>640.
-        jd = enemy.ai_timer
-        if enemy.ai_phase == 0.0:  # rising
-            if   jd > 10.0: vy = 15.0
-            elif jd >  9.0: vy = 14.0625
-            elif jd >  8.0: vy = 13.125
-            elif jd >  6.0: vy = 12.1875
-            elif jd >  5.0: vy = 10.3125
-            elif jd >  4.0: vy =  8.4375
-            elif jd >  2.0: vy =  6.5625
-            elif jd >  0.0: vy =  4.6875
-            else:
-                enemy.ai_phase = 1.0
-                enemy.ai_timer = 13.0
-                vy = 0.0
-            enemy.body.velocity.y = -vy * TILE_SIZE
-            enemy.ai_timer -= vy * dt
-        else:  # falling
-            if   jd > 11.0: vy =  4.6875
-            elif jd >  9.0: vy =  6.5625
-            elif jd >  8.0: vy =  8.4375
-            elif jd >  7.0: vy = 10.3125
-            elif jd >  6.0: vy = 12.1875
-            elif jd >  4.0: vy = 13.125
-            elif jd >  3.0: vy = 14.0625
-            else:            vy = 15.0
-            enemy.body.velocity.y = vy * TILE_SIZE
-            enemy.ai_timer -= vy * dt
-        enemy.body.velocity.x = enemy.home_x * 1.875 * TILE_SIZE
-        enemy.body.pos += enemy.body.velocity * dt
-        if enemy.body.pos.y > 20.0 * TILE_SIZE:  # C++ despawn at pos.y > 20 t
-            enemy.alive = False
+        enemy_ai.update_cheep_spawned(self, enemy, dt)
 
     def _update_podoboo(self, enemy: Enemy, dt: float) -> None:
-        # SDL3 PodobooBehavior: leap out of the lava, fall back, rest, repeat.
-        jump_speed = 12.5 * TILE_SIZE   # C++ EntityFactory::createPodoboo overrides to 12.5 t/s
-        gravity = 30.0 * TILE_SIZE      # C++ EntityFactory::createPodoboo overrides to 30.0 t/s²
-        if enemy.ai_phase == 0:  # resting in the lava
-            enemy.body.pos.y = enemy.home_y
-            enemy.ai_timer -= dt
-            if enemy.ai_timer <= 0:
-                enemy.ai_phase = 1
-                enemy.body.velocity.y = -jump_speed
-        else:  # airborne
-            enemy.body.velocity.y += gravity * dt
-            enemy.body.pos.y += enemy.body.velocity.y * dt
-            if enemy.body.velocity.y > 0 and enemy.body.pos.y >= enemy.home_y:
-                enemy.body.pos.y = enemy.home_y
-                enemy.body.velocity.y = 0.0
-                enemy.ai_phase = 0
-                enemy.ai_timer = 1.75  # C++ EntityFactory::createPodoboo overrides to 1.75s
+        enemy_ai.update_podoboo(self, enemy, dt)
 
     def _update_bullet(self, enemy: Enemy, dt: float) -> None:
-        # Bullet Bills ignore tile collisions and gravity entirely.
-        enemy.body.pos.x += enemy.body.velocity.x * dt
-        # Despawn once they leave the visible area on either side.
-        if (
-            enemy.body.pos.x + enemy.body.size.x < self.camera_x - ENEMY_DESPAWN_MARGIN
-            or enemy.body.pos.x > self.camera_x + SCREEN_SIZE[0] + ENEMY_DESPAWN_MARGIN
-        ):
-            enemy.alive = False
+        enemy_ai.update_bullet(self, enemy, dt)
 
     def _update_lakitu(self, enemy: Enemy, dt: float) -> None:
-        # Vertical bob: C++ sin(bob_timer * 2.5) * 0.25t; lerp coeff 0.12/frame = 7.2/s.
-        enemy.ai_phase += dt
-        bob_target_y = enemy.home_y + math.sin(enemy.ai_phase * 2.5) * 8.0
-        enemy.body.pos.y += (bob_target_y - enemy.body.pos.y) * min(1.0, dt * 7.2)
-
-        # Speed-based lead distance: slow=1.3125t, medium=3.0t, fast=4.0t (C++ LakituBehavior).
-        # home_x stores current_lead_distance in pixels (initialized to lead_distance_slow).
-        player_speed_t = abs(self.player.velocity.x) / TILE_SIZE
-        _LEAD_SLOW   = 1.3125 * TILE_SIZE
-        _LEAD_MEDIUM = 3.0 * TILE_SIZE
-        _LEAD_FAST   = 4.0 * TILE_SIZE
-        slow_t = min(1.0, player_speed_t / 1.0)
-        fast_t = min(1.0, max(0.0, (player_speed_t - 1.0) / 3.0))
-        target_lead = _LEAD_SLOW + (_LEAD_MEDIUM - _LEAD_SLOW) * slow_t + (_LEAD_FAST - _LEAD_MEDIUM) * fast_t
-        enemy.home_x += (target_lead - enemy.home_x) * min(1.0, dt * 4.0)
-
-        # Follow side: which direction the player is moving (with threshold hysteresis).
-        if self.player.velocity.x > 0.2 * TILE_SIZE:
-            follow_side = 1
-        elif self.player.velocity.x < -0.2 * TILE_SIZE:
-            follow_side = -1
-        else:
-            follow_side = 1 if self.player.pos.x >= enemy.body.pos.x else -1
-
-        target_x = self.player.pos.x + follow_side * enemy.home_x
-        dx = target_x - enemy.body.pos.x
-        abs_dx = abs(dx)
-
-        # Travel speed: blend base and catchup proportional to overshoot (C++ LakituBehavior).
-        _DEAD_ZONE = 0.18 * TILE_SIZE       # 5.76 px — stop jittering within dead zone
-        _CATCHUP_DIST = 4.0 * TILE_SIZE     # full catchup at ≥4t overshoot
-        _MAX_FOLLOW = 11.0 * TILE_SIZE      # 352 px/s cap
-        if abs_dx > _DEAD_ZONE:
-            base_speed   = max(2.2 * TILE_SIZE, abs(self.player.velocity.x) + 0.8 * TILE_SIZE)
-            catchup_speed = max(8.0 * TILE_SIZE, abs(self.player.velocity.x) + 2.0 * TILE_SIZE)
-            catchup_t = min(1.0, max(0.0, (abs_dx - TILE_SIZE) / (_CATCHUP_DIST - TILE_SIZE)))
-            travel_speed = min(base_speed + (catchup_speed - base_speed) * catchup_t, _MAX_FOLLOW)
-            desired_vx = travel_speed if dx > 0 else -travel_speed
-        else:
-            desired_vx = 0.0
-        enemy.body.velocity.x += (desired_vx - enemy.body.velocity.x) * min(1.0, dt * 12.0)
-        enemy.body.facing = -1 if self.player.pos.x < enemy.body.pos.x else 1
-        enemy.body.pos.x += enemy.body.velocity.x * dt
-
-        # Throw spiny egg periodically (C++ frenzy_interval = 128/60 ≈ 2.13s).
-        enemy.ai_timer += dt
-        if enemy.ai_timer > 128.0 / 60.0:
-            enemy.ai_timer = 0.0
-            self._spawn_spiny_drop(enemy)
+        enemy_ai.update_lakitu(self, enemy, dt)
 
     def _spawn_spiny_drop(self, lakitu: Enemy) -> None:
-        from .level import EntitySpawn
-
-        # C++ createLakituEgg: spawn 0.20t ahead + 0.55t below Lakitu, toward player.
-        direction = -1 if self.player.pos.x < lakitu.body.pos.x else 1
-        spawn_x = (lakitu.body.pos.x + 0.20 * TILE_SIZE * direction) / TILE_SIZE
-        spawn_y = (lakitu.body.pos.y + 0.55 * TILE_SIZE) / TILE_SIZE
-        spiny = create_enemy(EntitySpawn(type="Spiny", x=spawn_x, y=spawn_y))
-        spiny.frames = ("spikey1_0", "spikey1_1")
-        spiny.body.velocity.update(direction * 1.7 * TILE_SIZE, -2.0 * TILE_SIZE)  # C++ vel.vy = -2.0 t/s
-        spiny.ai_timer = 1.4   # C++ hatch_timer = 1.4f
-        spiny.home_x = float(direction)  # direction preserved for egg-phase velocity
-        self.enemies.append(spiny)
+        enemy_ai.spawn_spiny_drop(self, lakitu)
 
     def _update_hammerbro(self, enemy: Enemy, dt: float) -> None:
-        # C++ shimmy: direction reverses every ~64/60s. Effective amplitude ≈ 0.59t per leg.
-        # Clamping to ±0.65t around home_x approximates this without a separate timer field.
-        self._update_walker(enemy, dt)
-        if enemy.body.pos.x < enemy.home_x - 0.65 * TILE_SIZE:
-            enemy.body.velocity.x = abs(enemy.body.velocity.x or 17.6)  # 0.55 t/s × 32
-            enemy.body.facing = 1
-        elif enemy.body.pos.x > enemy.home_x + 0.65 * TILE_SIZE:
-            enemy.body.velocity.x = -abs(enemy.body.velocity.x or 17.6)
-            enemy.body.facing = -1
-        # Periodic jump (countdown timer; C++ jump_interval [0.9, 1.4]s).
-        enemy.ai_timer -= dt
-        if enemy.body.on_ground and enemy.ai_timer <= 0:
-            # C++ HammerBroBehavior: 22% chance of high_jump_speed (12.5 t/s), else 8.5 t/s
-            js = (12.5 if random.random() < 0.22 else 8.5) * TILE_SIZE
-            enemy.body.velocity.y = -js
-            enemy.ai_timer = random.uniform(0.9, 1.4)
-        # Periodic hammer throw (C++ throw_interval = 48/60s, no distance gate).
-        enemy.ai_phase += dt
-        if enemy.ai_phase > 48.0 / 60.0:  # C++ throw_interval = 48/60 s
-            enemy.ai_phase -= 48.0 / 60.0 + random.uniform(-6.0 / 60.0, 10.0 / 60.0)
-            if enemy.ai_phase < 0.0:
-                enemy.ai_phase = 0.0
-            self._throw_hammer(enemy)
+        enemy_ai.update_hammerbro(self, enemy, dt)
 
     def _update_bowser(self, enemy: Enemy, dt: float) -> None:
-        self._update_walker(enemy, dt)
-        if enemy.body.pos.x <= enemy.home_x - TILE_SIZE * 3:
-            enemy.body.velocity.x = abs(enemy.body.velocity.x or 24.0)  # 0.75 t/s × 32
-            enemy.body.facing = 1
-        elif enemy.body.pos.x >= enemy.home_x + TILE_SIZE * 3:
-            enemy.body.velocity.x = -abs(enemy.body.velocity.x or 24.0)
-            enemy.body.facing = -1
-        else:
-            # C++ updateBowser: in patrol range, face toward the player.
-            desired = 1 if self.player.pos.x >= enemy.body.pos.x else -1
-            if desired != enemy.body.facing:
-                enemy.body.facing = desired
-                enemy.body.velocity.x = desired * 24.0
-        # C++ stall prevention: keep Bowser moving if vx was zeroed by tile collision.
-        if abs(enemy.body.velocity.x) < 0.1:
-            enemy.body.velocity.x = enemy.body.facing * 24.0
-        enemy.ai_timer -= dt
-        if enemy.body.on_ground and enemy.ai_timer <= 0:  # C++ jump_interval [1.5, 2.8]s
-            enemy.body.velocity.y = -304.0  # C++ jump_speed = 9.5 t/s × 32
-            enemy.ai_timer = random.uniform(1.5, 2.8)
-        # Bowser breathes fire. C++: unconditional (no distance gate), max 1 active fire.
-        enemy.ai_phase += dt
-        if enemy.ai_phase > 1.8:
-            active_fires = sum(1 for p in self.enemy_projectiles if p.kind == "bowserfire" and p.alive)
-            if active_fires < 1:  # C++ kMaxActiveBowserFireProjectiles = 1
-                enemy.ai_phase = 1.8 - random.uniform(1.5, 2.9)  # C++ fire_interval [1.5,2.9]s
-                self._spawn_bowser_fire(enemy)
-        # C++ enable_hammers=true, hard_mode hammer_interval=1.4s. home_y = hammer_timer countdown.
-        enemy.home_y -= dt
-        if enemy.home_y <= 0:
-            interval = 1.4 + random.uniform(-10.0 / 60.0, 8.0 / 60.0)
-            enemy.home_y = max(28.0 / 60.0, interval)
-            self._throw_bowser_hammer(enemy)
+        enemy_ai.update_bowser(self, enemy, dt)
 
-    # ----------------------------------------------------------- enemy attacks
     def _throw_hammer(self, enemy: Enemy) -> None:
-        # C++ HammerBroBehavior: spawn at pos + 0.30t*dir horizontal, -0.45t vertical.
-        direction = -1 if self.player.pos.x < enemy.body.pos.x else 1
-        self.enemy_projectiles.append(
-            EnemyProjectile(
-                pos=pygame.Vector2(
-                    enemy.body.pos.x + 0.30 * TILE_SIZE * direction,
-                    enemy.body.pos.y - 0.45 * TILE_SIZE,
-                ),
-                velocity=pygame.Vector2(direction * 121.6, -262.4),  # C++ vx=3.8 t/s, vy=-8.2 t/s
-                kind="hammer",
-                affected_by_gravity=True,
-                lifetime=4.0,
-            )
-        )
+        enemy_ai.throw_hammer(self, enemy)
 
     def _throw_bowser_hammer(self, enemy: Enemy) -> None:
-        # C++ BowserBehavior: spawn at pos + 0.45t*dir horizontal, -0.8t vertical.
-        direction = -1 if self.player.pos.x < enemy.body.pos.x else 1
-        self.enemy_projectiles.append(
-            EnemyProjectile(
-                pos=pygame.Vector2(
-                    enemy.body.pos.x + 0.45 * TILE_SIZE * direction,
-                    enemy.body.pos.y - 0.8 * TILE_SIZE,
-                ),
-                velocity=pygame.Vector2(direction * 121.6, -262.4),  # same arc as HammerBro
-                kind="hammer",
-                affected_by_gravity=True,
-                lifetime=4.0,
-            )
-        )
+        enemy_ai.throw_bowser_hammer(self, enemy)
 
     def _spawn_bowser_fire(self, enemy: Enemy) -> None:
-        # C++ BowserBehavior: spawn at pos + 0.65t*dir horizontal, -0.2t vertical.
-        direction = -1 if self.player.pos.x < enemy.body.pos.x else 1
-        self.enemy_projectiles.append(
-            EnemyProjectile(
-                pos=pygame.Vector2(
-                    enemy.body.pos.x + 0.65 * TILE_SIZE * direction,
-                    enemy.body.pos.y - 0.2 * TILE_SIZE,
-                ),
-                velocity=pygame.Vector2(direction * 120.0, 0.0),  # C++ kBowserFireSpeed = 3.75 t/s × 32
-                kind="bowserfire",
-                affected_by_gravity=False,
-                lifetime=4.0,  # C++ Lifetime(entity, 4.0f)
-            )
-        )
-        self.events.append("bowserfire")  # C++ EnemyAISystem: plays "bowserfire" → fire.wav
+        enemy_ai.spawn_bowser_fire(self, enemy)
 
     def _update_enemy_projectiles(self, dt: float) -> None:
-        kept: list[EnemyProjectile] = []
-        for proj in self.enemy_projectiles:
-            if not proj.alive:
-                continue
-            proj.age += dt
-            if proj.affected_by_gravity:
-                # C++ hammer: terminal_velocity = 14.0 t/s = 448 px/s (not general MAX_FALL_SPEED)
-                proj.velocity.y = min(proj.velocity.y + HAMMER_GRAVITY * dt, 14.0 * TILE_SIZE)
-            proj.pos.x += proj.velocity.x * dt
-            proj.pos.y += proj.velocity.y * dt
-            # Tile collisions: hammers vanish when they land; Bowser fire
-            # ignores terrain entirely (SMB1) — only Mario contact stops it.
-            if proj.kind == "hammer":
-                for tile in self.collider.nearby(proj.rect):
-                    if proj.rect.colliderect(tile):
-                        if proj.velocity.y > 0:
-                            proj.alive = False
-                        break
-            if proj.age > proj.lifetime:
-                proj.alive = False
-            elif (
-                proj.pos.x < self.camera_x - ENEMY_DESPAWN_MARGIN
-                or proj.pos.x > self.camera_x + SCREEN_SIZE[0] + ENEMY_DESPAWN_MARGIN
-            ):
-                proj.alive = False
-            if proj.alive:
-                kept.append(proj)
-        self.enemy_projectiles = kept
+        enemy_ai.update_enemy_projectiles(self, dt)
 
     def _update_fireballs(self, dt: float) -> None:
         kept: list[Fireball] = []
@@ -1553,146 +1096,7 @@ class GameWorld:
             )
 
     def _handle_entity_collisions(self) -> None:
-        player_rect = self.player.rect
-
-        # Hazards — C++ checks power.invincible, which covers both regular and star immunity
-        if self.player.invincible_timer <= 0 and self.player.star_timer <= 0:
-            for fire in self.upfires:
-                if fire.state != 0 and player_rect.colliderect(fire.rect):
-                    # C++ UpFireSystem: sets power.is_dead = true (instant kill, never shrink).
-                    self._kill_player()
-                    return
-            for bar in self.firebars:
-                for pos in bar.segment_positions:
-                    # C++ AABB: 0.22 tile half-extents = 7.04px → 14×14px per segment.
-                    # C++ FireBarSystem: instant kill (power.is_dead = true), not shrink.
-                    if player_rect.colliderect(pygame.Rect(round(pos.x) - 7, round(pos.y) - 7, 14, 14)):
-                        self._kill_player()
-                        return
-
-        for enemy in self.enemies:
-            if not enemy.alive or not player_rect.colliderect(enemy.body.rect):
-                continue
-            from_above = (
-                self.player.velocity.y > 0
-                and player_rect.bottom <= enemy.body.rect.centery + 8
-            )
-
-            # Star power: kills most enemies; Bowser/Podoboo are star_immune (C++ star_vulnerable=false).
-            if self.player.star_timer > 0:
-                if not enemy.star_immune:
-                    self._kill_enemy(enemy, score=0, popup_x=enemy.body.rect.x, popup_y=enemy.body.rect.y,
-                                     launch_vy=-320.0)  # C++ markEnemyHitDeath -10 t/s
-                    self._award_combo_score(enemy.body.rect.x, enemy.body.rect.y)
-                    self.events.append("stomp")  # C++ handleStarDefeat plays "stomp"
-                continue  # star Mario is always immune to damage, even from immune enemies
-
-            # Shell-state collisions take priority over walker collisions.
-            if enemy.shell_state is ShellState.SHELL_STILL:
-                if from_above:
-                    self.player.velocity.y = -19.0 * TILE_SIZE  # C++ stomp_bounce = 19.0 t/s
-                    self._kick_shell(enemy, direction=1 if self.player.facing >= 0 else -1)
-                else:
-                    self._kick_shell(
-                        enemy,
-                        direction=1 if self.player.pos.x < enemy.body.pos.x else -1,
-                    )
-                continue
-            if enemy.shell_state is ShellState.SHELL_KICKED:
-                if from_above:
-                    self.player.velocity.y = -19.0 * TILE_SIZE  # C++ stomp_bounce = 19.0 t/s
-                    enemy.shell_state = ShellState.SHELL_STILL
-                    enemy.shell_wake_timer = SHELL_WAKE_TIME
-                    enemy.body.velocity.update(0.0, 0.0)
-                    enemy.kick_streak = 0
-                elif enemy.kick_grace <= 0 and self.player.invincible_timer <= 0:
-                    # Fresh kicks have a grace window so the shell clears Mario.
-                    self._take_damage()
-                    return
-                continue
-
-            # Plain walker.
-            if from_above and enemy.stompable:
-                self.player.velocity.y = -19.0 * TILE_SIZE  # C++ stomp_bounce = 19.0 t/s
-                if enemy.winged:
-                    # First stomp only strips the wings (SDL3 para-koopa rule).
-                    # C++ handleShellStomp: no awardComboScore for wing strip.
-                    enemy.winged = False
-                    enemy.frames = ENEMY_FRAMES.get(
-                        "RedKoopa" if enemy.kind == "RedParaKoopa" else "KoopaTroopa",
-                        enemy.frames,
-                    )
-                elif enemy.gives_shell:
-                    # C++ handleShellStomp: no awardComboScore for shell conversion.
-                    self._convert_to_shell(enemy)
-                else:
-                    dead_frame = ENEMY_DEAD_FRAMES.get(enemy.kind)
-                    squish = bool(dead_frame)
-                    # C++ handleStomp: non-flattenable use markEnemyHitDeath(-9 t/s), no score.
-                    launch_vy = 0.0 if squish else -9.0 * TILE_SIZE
-                    self._kill_enemy(enemy, score=0, popup_x=enemy.body.rect.x, popup_y=enemy.body.rect.y,
-                                     stomp_squish=squish, launch_vy=launch_vy)
-                    if squish:
-                        # C++ awardComboScore only for flattenable (squish) kills.
-                        self._award_combo_score(enemy.body.rect.x, enemy.body.rect.y)
-                self.events.append("stomp")
-            elif self.player.invincible_timer > 0:
-                continue
-            else:
-                self._take_damage()
-                return
-
-        # Fireball vs enemies (skip fire-immune enemies).
-        for fireball in self.fireballs:
-            if not fireball.alive:
-                continue
-            for enemy in self.enemies:
-                if not enemy.alive or not fireball.rect.colliderect(enemy.body.rect):
-                    continue
-                if enemy.fire_immune:
-                    fireball.alive = False
-                    fireball.explode_timer = 0.15
-                    self.events.append("blockhit")  # C++ plays "blockbump" on immune-enemy contact
-                    break
-                if enemy.kind == "Bowser":
-                    # Bowser soaks 5 fireball hits before falling (matches SDL3).
-                    fireball.alive = False
-                    fireball.explode_timer = 0.15
-                    enemy.fireball_hits += 1
-                    if enemy.fireball_hits >= 5:
-                        self._kill_enemy(enemy, score=5000, popup_x=enemy.body.rect.x, popup_y=enemy.body.rect.y)
-                        self.events.append("bowserfall")  # C++ checkFireballCollisions: "bowserfall" on Bowser death
-                    break
-                self._kill_enemy(enemy, score=200, popup_x=enemy.body.rect.x, popup_y=enemy.body.rect.y)  # launch_vy=-256 default
-                fireball.alive = False
-                fireball.explode_timer = 0.15
-                self.events.append("fireball")  # C++ checkFireballCollisions: "fireball" on regular kill
-                break
-
-        # Enemy projectiles (hammers, bowser fire) damage the player on contact.
-        for proj in self.enemy_projectiles:
-            if not proj.alive or not player_rect.colliderect(proj.rect):
-                continue
-            if self.player.star_timer > 0:
-                # C++ star power: only defeats star_vulnerable projectiles (hammers).
-                # Bowserfire/venusfire are NOT star_vulnerable — they pass through.
-                if proj.kind == "hammer":
-                    proj.alive = False
-                continue
-            if self.player.invincible_timer > 0:
-                # C++ handleDamage: returns early when invincible; projectile not destroyed.
-                continue
-            proj.alive = False
-            self._take_damage()
-            return
-
-        kept_collectibles: list[Collectible] = []
-        for collectible in self.collectibles:
-            if collectible.emerge_remaining <= 0 and player_rect.colliderect(collectible.rect):
-                self._collect(collectible)
-            else:
-                kept_collectibles.append(collectible)
-        self.collectibles = kept_collectibles
+        collision_logic.handle_entity_collisions(self)
 
     def _collect(self, collectible: Collectible) -> None:
         if collectible.kind == "Coin":
@@ -1760,10 +1164,11 @@ class GameWorld:
         self.player.is_shrinking = True
         self.player.shrink_timer = 0.0
         self.player.pending_state = shrink_to
+        self._apply_state_change(shrink_to)
         self.player.invincible_timer = INVINCIBILITY_TIME
         self.events.append("shrink")
 
-    def _handle_goal(self) -> None:
+    def _handle_goal(self, dt: float) -> None:
         player_rect = self.player.rect
         world_end = self.level.meta.width * TILE_SIZE - TILE_SIZE * 2
 
@@ -1785,7 +1190,7 @@ class GameWorld:
         if any(player_rect.colliderect(goal) for goal in self.goal_rects):
             # Touched the flagpole — score by grab height (top of pole = best).
             goal = next(goal for goal in self.goal_rects if player_rect.colliderect(goal))
-            self._begin_flagpole_slide(goal)
+            self._begin_flagpole_slide(goal, dt)
             return
 
         if player_rect.x >= world_end:
@@ -1802,17 +1207,17 @@ class GameWorld:
         self.skip_complete = False
         self.events.append("complete")
 
-    def _begin_flagpole_slide(self, goal: pygame.Rect) -> None:
-        # Convert vertical position on the pole to a score tier.
-        # Top  of pole grants 5000, bottom grants 100.
-        top = goal.top
-        bottom = goal.top + goal.height
-        relative = (self.player.pos.y - top) / max(1.0, (bottom - top))
-        relative = max(0.0, min(1.0, relative))
-        tiers = (5000, 2000, 1000, 500, 200, 100)
-        idx = min(int(relative * len(tiers)), len(tiers) - 1)
-        self.score += tiers[idx]
-        self._popup(str(tiers[idx]), int(self.player.pos.x), int(self.player.pos.y))
+    def _begin_flagpole_slide(self, goal: pygame.Rect, dt: float) -> None:
+        pole_top_px = float(goal.top)
+        pole_height_px = float(goal.height)
+        player_y = float(self.player.pos.y - self.player.velocity.y * dt)
+        frac = max(0.0, min(1.0, 1.0 - (player_y - pole_top_px) / pole_height_px))
+        bonus_table = (100, 200, 500, 1000, 2000, 5000)
+        bonus_idx = min(int(frac * 5.0), 5)
+        bonus = bonus_table[bonus_idx]
+        self.score += bonus
+        self.score += 1000
+        self._popup(str(bonus), int(self.player.pos.x), int(self.player.pos.y))
         self.player.velocity.update(0.0, 0.0)
         # Snap Mario to the side of the pole.
         self.player.pos.x = goal.x - 4
