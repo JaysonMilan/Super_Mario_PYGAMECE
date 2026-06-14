@@ -1451,10 +1451,11 @@ class GameWorld:
             if content == "Coin":
                 self.coins += 1
                 self.score += 200  # SMB1: coin = 200 points
-                self.events.append("coin")
                 self._spawn_block_coin(tile_rect_)
                 self._popup("200", tile_rect_.x, tile_rect_.y)
-                self._maybe_oneup()
+                # C++: plays "oneup" instead of "coin" on the 100th coin (not both).
+                if not self._maybe_oneup():
+                    self.events.append("coin")
             elif content == "OneUp":
                 self._spawn_block_powerup(tile_rect_, "OneUp")
                 self.events.append("mushroomappear")
@@ -1698,9 +1699,10 @@ class GameWorld:
         if collectible.kind == "Coin":
             self.coins += 1
             self.score += 200  # SMB1: coin = 200 points
-            self.events.append("coin")
             self._popup("200", collectible.rect.x, collectible.rect.y)
-            self._maybe_oneup()
+            # C++: plays "oneup" instead of "coin" on the 100th coin (not both).
+            if not self._maybe_oneup():
+                self.events.append("coin")
         elif collectible.kind == "Mushroom":
             self.score += 1000
             self._popup("1000", collectible.rect.x, collectible.rect.y)
@@ -1729,12 +1731,14 @@ class GameWorld:
             self.events.append("oneup")
             self._popup("1UP", collectible.rect.x, collectible.rect.y)
 
-    def _maybe_oneup(self) -> None:
+    def _maybe_oneup(self) -> bool:
         if self.coins >= 100:
             self.coins -= 100
             self.lives += 1
             self.player.invincible_timer = max(self.player.invincible_timer, INVINCIBILITY_TIME)
             self.events.append("oneup")
+            return True
+        return False
 
     def _begin_powerup(self, state: PowerState) -> None:
         self.player.powerup_freeze = POWERUP_FREEZE
