@@ -1331,7 +1331,7 @@ class GameWorld:
                 lifetime=4.0,  # C++ Lifetime(entity, 4.0f)
             )
         )
-        self.events.append("fire")
+        self.events.append("bowserfire")  # C++ EnemyAISystem: plays "bowserfire" → fire.wav
 
     def _update_enemy_projectiles(self, dt: float) -> None:
         kept: list[EnemyProjectile] = []

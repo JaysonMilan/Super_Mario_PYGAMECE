@@ -7,6 +7,15 @@ from typing import Any
 import pygame
 
 
+# Hard overrides applied even when the atlas has the name: the pipe3 sprites
+# in the shipped atlas are checkerboard placeholder art, so use the green pipe.
+SPRITE_OVERRIDES = {
+    "pipe3_left_top": "pipe_left_top",
+    "pipe3_right_top": "pipe_right_top",
+    "pipe3_left_bot": "pipe_left_bot",
+    "pipe3_right_bot": "pipe_right_bot",
+}
+
 SPRITE_ALIASES = {
     "coin": "coin_0",
     "goomba": "goombas_0",
@@ -53,6 +62,23 @@ class SpriteBank:
     def missing_sprites(self) -> tuple[str, ...]:
         return tuple(sorted(self._missing))
 
+    def native_size(self, name: str) -> tuple[int, int] | None:
+        """Unscaled atlas dimensions, for aspect-correct rendering."""
+        sprite_name = self._resolve_name(name)
+        entry = self._sprites.get(sprite_name)
+        if entry is None:
+            return None
+        return entry[1].width, entry[1].height
+
+    def native_surface(self, name: str) -> pygame.Surface | None:
+        """Unscaled atlas pixels, e.g. the UI font strip."""
+        sprite_name = self._resolve_name(name)
+        entry = self._sprites.get(sprite_name)
+        if entry is None:
+            return None
+        atlas_name, rect = entry
+        return self._atlases[atlas_name].subsurface(rect)
+
     def placeholder(self, size: tuple[int, int]) -> pygame.Surface:
         surface = pygame.Surface(size, pygame.SRCALPHA)
         surface.fill((230, 75, 75, 255))
@@ -81,6 +107,9 @@ class SpriteBank:
                 )
 
     def _resolve_name(self, name: str) -> str:
+        override = SPRITE_OVERRIDES.get(name)
+        if override is not None:
+            return override
         if name in self._sprites:
             return name
         alias = SPRITE_ALIASES.get(name)
@@ -99,6 +128,7 @@ class AudioManager:
         "rainboom": "rainboom.wav",
         "bridgebreak": "bridgebreak.wav",
         "bowserfall": "bowserfall.wav",
+        "bowserfire": "fire.wav",
         "bulletbill": "bulletbill.wav",
         "swim": "swim.wav",
         "stomp": "stomp.wav",
@@ -114,6 +144,9 @@ class AudioManager:
         "pause": "pause.wav",
         "gameover": "gameover.wav",
         "pipe": "pipe.wav",
+        "intermission": "intermission.wav",
+        "scorering": "scorering.wav",
+        "princessmusic": "princessmusic.wav",
     }
 
     def __init__(self, sounds_dir: Path, enabled: bool = True) -> None:
