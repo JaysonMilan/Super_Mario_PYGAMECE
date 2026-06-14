@@ -1681,15 +1681,18 @@ class GameWorld:
         elif collectible.kind == "Mushroom":
             self.score += 1000
             self._popup("1000", collectible.rect.x, collectible.rect.y)
-            self.player.invincible_timer = max(self.player.invincible_timer, INVINCIBILITY_TIME)
             if self.player.state is PowerState.SMALL:
+                # C++: invincible only when form actually changes (Small → Big).
+                self.player.invincible_timer = max(self.player.invincible_timer, INVINCIBILITY_TIME)
                 self._begin_powerup(PowerState.SUPER)
             self.events.append("powerup")
         elif collectible.kind in {"FireFlower", "Flower"}:
             self.score += 1000
             self._popup("1000", collectible.rect.x, collectible.rect.y)
-            self.player.invincible_timer = max(self.player.invincible_timer, INVINCIBILITY_TIME)
-            self._begin_powerup(PowerState.FIRE)
+            if self.player.state is not PowerState.FIRE:
+                # C++: invincible + form change only when not already Fire.
+                self.player.invincible_timer = max(self.player.invincible_timer, INVINCIBILITY_TIME)
+                self._begin_powerup(PowerState.FIRE)
             self.events.append("powerup")
         elif collectible.kind == "Star":
             self.score += 1000
