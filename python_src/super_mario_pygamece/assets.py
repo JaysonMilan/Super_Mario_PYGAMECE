@@ -132,6 +132,7 @@ class AudioManager:
         "coin": "coin.wav",
         "powerup": "mushroomeat.wav",
         "mushroomappear": "mushroomappear.wav",
+        "starpower": "starmusic.wav",
         "rainboom": "rainboom.wav",
         "bridgebreak": "bridgebreak.wav",
         "bowserfall": "bowserfall.wav",

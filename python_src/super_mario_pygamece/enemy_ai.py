@@ -186,8 +186,8 @@ def update_cheep_spawned(world: EnemyAIWorld, enemy: Enemy, dt: float) -> None:
 
 
 def update_podoboo(world: EnemyAIWorld, enemy: Enemy, dt: float) -> None:
-    jump_speed = 12.5 * TILE_SIZE
-    gravity = 30.0 * TILE_SIZE
+    jump_speed = 12.0 * TILE_SIZE   # C++ PodobooBehavior::jump_speed = 12.0 t/s
+    gravity = 32.0 * TILE_SIZE      # C++ PodobooBehavior::gravity = 32.0 t/s²
     if enemy.ai_phase == 0:
         enemy.body.pos.y = enemy.home_y
         enemy.ai_timer -= dt
@@ -201,7 +201,7 @@ def update_podoboo(world: EnemyAIWorld, enemy: Enemy, dt: float) -> None:
             enemy.body.pos.y = enemy.home_y
             enemy.body.velocity.y = 0.0
             enemy.ai_phase = 0
-            enemy.ai_timer = 1.75
+            enemy.ai_timer = 1.8  # C++ PodobooBehavior::cooldown_duration = 1.8
 
 
 def update_bullet(world: EnemyAIWorld, enemy: Enemy, dt: float) -> None:

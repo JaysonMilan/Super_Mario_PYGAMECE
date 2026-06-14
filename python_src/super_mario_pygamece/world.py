@@ -1126,7 +1126,7 @@ class GameWorld:
             self.score += 1000
             self._popup("1000", collectible.rect.x, collectible.rect.y)
             self.player.star_timer = 9.17  # 550 frames @ 60fps, matches SDL3
-            self.events.append("rainboom")
+            self.events.append("starpower")
         elif collectible.kind == "OneUp":
             self.lives += 1
             self.score += 1000  # C++ ItemCollectionSystem: OneUp = 1000 pts
