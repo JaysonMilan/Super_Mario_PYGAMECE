@@ -354,7 +354,9 @@ class GameWorld:
     ) -> None:
         if self.state is WorldState.DYING or self.state is WorldState.TIMEOUT:
             self.player.death_timer += dt
-            self.player.velocity.y = min(self.player.velocity.y + GRAVITY * dt, MAX_FALL_SPEED)
+            # C++ GravitySystem: rising uses gravity_rising=55, falling uses gravity_falling=80.
+            _dgrav = GRAVITY_RISING if self.player.velocity.y < 0 else GRAVITY
+            self.player.velocity.y = min(self.player.velocity.y + _dgrav * dt, MAX_FALL_SPEED)
             self.player.pos.y += self.player.velocity.y * dt
             self.respawn_timer -= dt
             if self.respawn_timer <= 0:
