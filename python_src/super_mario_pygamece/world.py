@@ -465,7 +465,7 @@ class GameWorld:
         if self.on_platform:
             self.player.pos += self.on_platform.delta_pos
 
-        self._update_player(keys, jump_pressed, jump_held, jump_released, fire_pressed, dt)
+        self._update_player(keys, jump_pressed, jump_held, fire_pressed, dt)
         if self.player.pipe_state == PipeState.NONE:
             self._try_start_pipe_entry(keys)
         
@@ -581,7 +581,6 @@ class GameWorld:
         keys: KeyState,
         jump_pressed: bool,
         jump_held: bool,
-        jump_released: bool,
         fire_pressed: bool,
         dt: float,
     ) -> None:
@@ -650,9 +649,6 @@ class GameWorld:
             self.coyote_timer = 0.0
             self.jump_buffer_timer = 0.0
             self.events.append("jumpbig" if self.player.state is not PowerState.SMALL else "jump")
-
-        if jump_released and self.player.velocity.y < 0:
-            self.player.velocity.y *= 0.5
 
         # Fireball
         if self.player.fire_cooldown > 0:
