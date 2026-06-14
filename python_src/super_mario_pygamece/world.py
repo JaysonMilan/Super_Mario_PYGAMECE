@@ -948,6 +948,11 @@ class GameWorld:
                     continue
                 if not shell.body.rect.colliderect(other.body.rect):
                     continue
+                if other.star_immune:
+                    # C++ EnemyShell: shells bounce off star-immune enemies (Bowser, Podoboo).
+                    shell.body.velocity.x = -shell.body.velocity.x
+                    shell.body.facing = -shell.body.facing
+                    break
                 other.alive = False
                 other.death_timer = 1.0  # C++ DeathType::Hit: death_duration = 1.0s
                 other.stomp_kill = False
