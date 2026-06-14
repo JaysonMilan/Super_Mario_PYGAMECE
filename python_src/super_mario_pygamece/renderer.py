@@ -408,7 +408,10 @@ class Renderer:
         for bump in world.bumps:
             if not visible.colliderect(bump.rect):
                 continue
-            offset = int(round(-12 * (bump.timer / 0.18) * (1 - bump.timer / 0.18) * 4))
+            # C++ TilemapRenderSystem: normalized=1-(timer/0.12), triangle peak=0.22t=7px upward.
+            _norm = 1.0 - bump.timer / 0.12
+            _peak = 7.04  # 0.22 tiles × 32 px
+            offset = -int(round(_peak * (_norm / 0.5 if _norm < 0.5 else (1.0 - _norm) / 0.5)))
             self._screen.blit(
                 self._sprites.get(bump.sprite),
                 (bump.rect.x - cam_x, bump.rect.y + offset - cam_y),
