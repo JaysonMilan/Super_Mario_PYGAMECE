@@ -1558,12 +1558,15 @@ class GameWorld:
         if self.player.invincible_timer <= 0 and self.player.star_timer <= 0:
             for fire in self.upfires:
                 if fire.state != 0 and player_rect.colliderect(fire.rect):
-                    self._take_damage()
+                    # C++ UpFireSystem: sets power.is_dead = true (instant kill, never shrink).
+                    self._kill_player()
                     return
             for bar in self.firebars:
                 for pos in bar.segment_positions:
-                    if player_rect.colliderect(pygame.Rect(pos.x - 4, pos.y - 4, 8, 8)):
-                        self._take_damage()
+                    # C++ AABB: 0.22 tile half-extents = 7.04px → 14×14px per segment.
+                    # C++ FireBarSystem: instant kill (power.is_dead = true), not shrink.
+                    if player_rect.colliderect(pygame.Rect(round(pos.x) - 7, round(pos.y) - 7, 14, 14)):
+                        self._kill_player()
                         return
 
         for enemy in self.enemies:
@@ -1668,13 +1671,20 @@ class GameWorld:
 
         # Enemy projectiles (hammers, bowser fire) damage the player on contact.
         for proj in self.enemy_projectiles:
-            if proj.alive and player_rect.colliderect(proj.rect):
-                if self.player.star_timer > 0 or self.player.invincible_timer > 0:
+            if not proj.alive or not player_rect.colliderect(proj.rect):
+                continue
+            if self.player.star_timer > 0:
+                # C++ star power: only defeats star_vulnerable projectiles (hammers).
+                # Bowserfire/venusfire are NOT star_vulnerable — they pass through.
+                if proj.kind == "hammer":
                     proj.alive = False
-                    continue
-                proj.alive = False
-                self._take_damage()
-                return
+                continue
+            if self.player.invincible_timer > 0:
+                # C++ handleDamage: returns early when invincible; projectile not destroyed.
+                continue
+            proj.alive = False
+            self._take_damage()
+            return
 
         kept_collectibles: list[Collectible] = []
         for collectible in self.collectibles:
