@@ -124,8 +124,7 @@ def handle_entity_collisions(world: CollisionWorld) -> None:
                     stomp_squish=squish,
                     launch_vy=launch_vy,
                 )
-                if squish:
-                    world._award_combo_score(enemy.body.rect.x, enemy.body.rect.y)
+                world._award_combo_score(enemy.body.rect.x, enemy.body.rect.y)
             world.events.append("stomp")
         elif world.player.invincible_timer > 0:
             continue
