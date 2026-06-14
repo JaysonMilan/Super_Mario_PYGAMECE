@@ -1584,7 +1584,7 @@ class GameWorld:
                     self._kill_enemy(enemy, score=0, popup_x=enemy.body.rect.x, popup_y=enemy.body.rect.y,
                                      launch_vy=-320.0)  # C++ markEnemyHitDeath -10 t/s
                     self._award_combo_score(enemy.body.rect.x, enemy.body.rect.y)
-                    self.events.append("kick")
+                    self.events.append("stomp")  # C++ handleStarDefeat plays "stomp"
                 continue  # star Mario is always immune to damage, even from immune enemies
 
             # Shell-state collisions take priority over walker collisions.
@@ -1616,16 +1616,15 @@ class GameWorld:
                 self.player.velocity.y = -19.0 * TILE_SIZE  # C++ stomp_bounce = 19.0 t/s
                 if enemy.winged:
                     # First stomp only strips the wings (SDL3 para-koopa rule).
+                    # C++ handleShellStomp: no awardComboScore for wing strip.
                     enemy.winged = False
                     enemy.frames = ENEMY_FRAMES.get(
                         "RedKoopa" if enemy.kind == "RedParaKoopa" else "KoopaTroopa",
                         enemy.frames,
                     )
-                    self._award_combo_score(enemy.body.rect.x, enemy.body.rect.y)
-                    self.events.append("stomp")
                 elif enemy.gives_shell:
+                    # C++ handleShellStomp: no awardComboScore for shell conversion.
                     self._convert_to_shell(enemy)
-                    self._award_combo_score(enemy.body.rect.x, enemy.body.rect.y)
                 else:
                     dead_frame = ENEMY_DEAD_FRAMES.get(enemy.kind)
                     squish = bool(dead_frame)
@@ -1662,12 +1661,12 @@ class GameWorld:
                     enemy.fireball_hits += 1
                     if enemy.fireball_hits >= 5:
                         self._kill_enemy(enemy, score=5000, popup_x=enemy.body.rect.x, popup_y=enemy.body.rect.y)
-                        self.events.append("kick")
+                        self.events.append("bowserfall")  # C++ checkFireballCollisions: "bowserfall" on Bowser death
                     break
                 self._kill_enemy(enemy, score=200, popup_x=enemy.body.rect.x, popup_y=enemy.body.rect.y)  # launch_vy=-256 default
                 fireball.alive = False
                 fireball.explode_timer = 0.15
-                self.events.append("kick")
+                self.events.append("fireball")  # C++ checkFireballCollisions: "fireball" on regular kill
                 break
 
         # Enemy projectiles (hammers, bowser fire) damage the player on contact.
