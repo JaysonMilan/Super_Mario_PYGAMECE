@@ -275,7 +275,7 @@ class Renderer:
         cy = int(_H * 0.42)
         title = "GAME OVER"
         f.draw_shadow(self._screen, title, cx - f.width(title, FS_TITLE) // 2, cy, FS_TITLE)
-        lives_str = f"LIVES  {world.lives:02d}"
+        lives_str = f"LIVES {world.lives:02d}"
         f.draw_shadow(self._screen, lives_str, cx - f.width(lives_str, FS_HUD) // 2, cy + 38, FS_HUD)
         if world.gameover_timer <= 0:
             prompt = "PRESS JUMP OR RUN"

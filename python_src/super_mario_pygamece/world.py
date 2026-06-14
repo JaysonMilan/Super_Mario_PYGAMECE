@@ -1130,7 +1130,7 @@ class GameWorld:
             self.score += 1000  # C++ ItemCollectionSystem: OneUp = 1000 pts
             self.player.invincible_timer = max(self.player.invincible_timer, INVINCIBILITY_TIME)
             self.events.append("oneup")
-            self._popup("1UP", collectible.rect.x, collectible.rect.y)
+            self._popup("1UP!", collectible.rect.x, collectible.rect.y)
 
     def _maybe_oneup(self) -> bool:
         if self.coins >= 100:
