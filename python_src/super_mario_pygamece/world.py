@@ -49,6 +49,7 @@ from .settings import (
     AIR_ACCELERATION,
     CAMERA_FOLLOW_SPEED,
     COYOTE_TIME,
+    DEATH_ANIM_DURATION,
     ENEMY_DESPAWN_MARGIN,
     ENEMY_SPEED,
     FIREBALL_COOLDOWN,
@@ -366,10 +367,11 @@ class GameWorld:
     ) -> None:
         if self.state is WorldState.DYING or self.state is WorldState.TIMEOUT:
             self.player.death_timer += dt
-            # C++ GravitySystem: rising uses gravity_rising=55, falling uses gravity_falling=80.
-            _dgrav = GRAVITY_RISING if self.player.velocity.y < 0 else GRAVITY
-            self.player.velocity.y = min(self.player.velocity.y + _dgrav * dt, MAX_FALL_SPEED)
-            self.player.pos.y += self.player.velocity.y * dt
+            # C++ phase 1: physics run for death_duration=3.0s, then 2.0s extra wait before respawn.
+            if self.player.death_timer < DEATH_ANIM_DURATION:
+                _dgrav = GRAVITY_RISING if self.player.velocity.y < 0 else GRAVITY
+                self.player.velocity.y = min(self.player.velocity.y + _dgrav * dt, MAX_FALL_SPEED)
+                self.player.pos.y += self.player.velocity.y * dt
             self.respawn_timer -= dt
             if self.respawn_timer <= 0:
                 if self.lives <= 0:
@@ -423,7 +425,7 @@ class GameWorld:
             self._low_time_warned = True
         if self.time_remaining <= 0:
             self.state = WorldState.TIMEOUT
-            self.respawn_timer = RESPAWN_DELAY
+            self.respawn_timer = DEATH_ANIM_DURATION + RESPAWN_DELAY  # 3.0s anim + 2.0s delay
             self.lives -= 1
             self.player.death_timer = 0.0
             self.player.velocity.update(0.0, -480.0)
@@ -1368,7 +1370,7 @@ class GameWorld:
         self.sync_to_session()
         
         self.state = WorldState.DYING
-        self.respawn_timer = RESPAWN_DELAY
+        self.respawn_timer = DEATH_ANIM_DURATION + RESPAWN_DELAY  # 3.0s anim + 2.0s delay = 5.0s
         self.player.death_timer = 0.0
         self.player.velocity.update(0.0, -480.0)
         self.events.append("death")

@@ -68,7 +68,14 @@ def handle_entity_collisions(world: CollisionWorld) -> None:
     for enemy in world.enemies:
         if not enemy.alive or not player_rect.colliderect(enemy.body.rect):
             continue
-        from_above = world.player.velocity.y > 0 and player_rect.bottom <= enemy.body.rect.centery + 8
+        # C++ isStompingEnemy: vy > 0.5 t/s (16px/s), player bottom above enemy center,
+        # and feet within [-0.1t, 0.4t] = [-3.2, 12.8] px of enemy top.
+        _feet_to_top = player_rect.bottom - enemy.body.rect.top
+        from_above = (
+            world.player.velocity.y > 16.0
+            and player_rect.bottom < enemy.body.rect.centery
+            and -3.2 <= _feet_to_top <= 12.8
+        )
 
         if world.player.star_timer > 0:
             if not enemy.star_immune:
@@ -124,7 +131,10 @@ def handle_entity_collisions(world: CollisionWorld) -> None:
                     stomp_squish=squish,
                     launch_vy=launch_vy,
                 )
-                world._award_combo_score(enemy.body.rect.x, enemy.body.rect.y)
+                if squish:
+                    # C++ handleStomp: awardComboScore only for EnemyDeath::Stomped (Goomba);
+                    # non-flattenable enemies (HammerBro, CheepCheep, etc.) early-return before it.
+                    world._award_combo_score(enemy.body.rect.x, enemy.body.rect.y)
             world.events.append("stomp")
         elif world.player.invincible_timer > 0:
             continue

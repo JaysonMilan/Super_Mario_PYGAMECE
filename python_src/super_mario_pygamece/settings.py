@@ -20,7 +20,8 @@ MAX_FALL_SPEED = 640.0    # C++ terminal_velocity = 20.0 t/s × 32
 COYOTE_TIME = 0.12        # C++ coyote_time = 0.12
 JUMP_BUFFER_TIME = 0.20   # C++ buffer_time = 0.20
 CAMERA_FOLLOW_SPEED = 8.0
-RESPAWN_DELAY = 2.0       # C++ respawn_delay_timer_ < 2.0
+DEATH_ANIM_DURATION = 3.0  # C++ PowerUpState::death_duration = 3.0f
+RESPAWN_DELAY = 2.0        # C++ respawn_delay_timer_ < 2.0 (waits after death anim)
 PIPE_ANIM_DURATION = 0.60  # C++ PipeEntry::kAnimDuration = 0.6
 STARTING_LIVES = 3
 
