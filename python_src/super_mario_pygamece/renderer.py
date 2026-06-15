@@ -568,7 +568,7 @@ class Renderer:
             )
 
     def _draw_player(self, world: GameWorld, cam_x: int, cam_y: int) -> None:
-        if world.player.invincible_timer > 0 and int(world.player.invincible_timer * 20) % 2 == 0:
+        if world.player.invincible_timer > 0 and int(world.player.invincible_timer * 10) % 2 == 0:
             return
         rect = world.player.rect
         frame = world.player_frame()
