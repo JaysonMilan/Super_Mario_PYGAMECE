@@ -549,8 +549,8 @@ class GameWorld:
         prefix = self._mario_prefix()
 
         if self.state is WorldState.LEVEL_END_WALK:
-            suffix = ("_end", "_end1")[int(pygame.time.get_ticks() / 100) % 2]
-            return f"{prefix}{suffix}"
+            phase = int(pygame.time.get_ticks() / 100) % 3
+            return f"{prefix}_move{phase}"
 
         if self.player.pipe_state != PipeState.NONE:
             if self.player.state == PowerState.SMALL:
