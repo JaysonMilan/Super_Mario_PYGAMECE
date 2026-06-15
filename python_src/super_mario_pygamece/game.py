@@ -177,8 +177,10 @@ class PygameMario:
         stem = self.level_path.stem if self.level_path else ""
         match = re.fullmatch(r"(\d+)-(\d+)", stem)
         next_path = None
+        crossed_world = False
         if match:
             world_no, stage_no = int(match.group(1)), int(match.group(2))
+            crossed_world = stage_no == 4
             world_no, stage_no = (world_no, stage_no + 1) if stage_no < 4 else (world_no + 1, 1)
             wanted = f"{world_no}-{stage_no}"
             next_path = next((p for p in self.level_paths if p.stem == wanted), None)
@@ -199,10 +201,14 @@ class PygameMario:
         new_world.active_player_index = active
         new_world.apply_from_session()
         new_world._apply_state_change(sessions[active].state)
-        self._pending_world = new_world
 
-        character = sessions[active].character if sessions else "MARIO"
-        self._enter_intermission(new_world.world_display, new_world.lives, character)
+        if crossed_world:
+            self._pending_world = new_world
+            character = sessions[active].character if sessions else "MARIO"
+            self._enter_intermission(new_world.world_display, new_world.lives, character)
+        else:
+            self.world = new_world
+            self.state = AppState.PLAYING
 
     def _enter_intermission(self, world_display: str, lives: int, character: str = "MARIO") -> None:
         self.intermission_timer = 0.0
