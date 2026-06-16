@@ -163,7 +163,7 @@ def handle_entity_collisions(world: CollisionWorld) -> None:
                     world._kill_enemy(enemy, score=5000, popup_x=enemy.body.rect.x, popup_y=enemy.body.rect.y)
                     world.events.append("bowserfall")
                 break
-            world._kill_enemy(enemy, score=200, popup_x=enemy.body.rect.x, popup_y=enemy.body.rect.y)
+            world._kill_enemy(enemy, score=200, popup_x=enemy.body.rect.x, popup_y=enemy.body.rect.y, launch_vy=-320.0)  # C++ markEnemyHitDeath -10 t/s
             fireball.alive = False
             fireball.explode_timer = 0.15
             world.events.append("fireball")
