@@ -49,8 +49,8 @@ def update_walker(world: EnemyAIWorld, enemy: Enemy, dt: float) -> None:
     if enemy.winged and enemy.body.on_ground:
         enemy.ai_timer -= dt
         if enemy.ai_timer <= 0:
-            enemy.ai_timer = 1.1
-            enemy.body.velocity.y = -8.2 * TILE_SIZE
+            enemy.ai_timer = 1.2  # C++ KoopaWingedBehavior::jump_interval = 1.2f
+            enemy.body.velocity.y = -8.0 * TILE_SIZE  # C++ jump_speed = 8.0 t/s
 
     before_x = enemy.body.pos.x
     before_vx = enemy.body.velocity.x
