@@ -574,7 +574,7 @@ class Renderer:
         frame = world.player_frame()
         size = self._fit_to_height(frame, rect.height)
         sprite = self._sprites.get(frame, size)
-        if world.player.facing < 0:
+        if world.player.facing < 0 and world.state is not WorldState.DYING:
             sprite = pygame.transform.flip(sprite, True, False)
         if world.player.star_timer > 0:
             tint = self._star_tint(world.player.star_timer)
