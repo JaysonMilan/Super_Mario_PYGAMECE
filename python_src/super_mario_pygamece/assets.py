@@ -142,6 +142,7 @@ class AudioManager:
         "stomp": "stomp.wav",
         "death": "death.wav",
         "complete": "levelend.wav",
+        "castlecomplete": "castleend.wav",
         "blockhit": "blockhit.wav",
         "blockbreak": "blockbreak.wav",
         "fireball": "fireball.wav",

@@ -230,7 +230,7 @@ class Renderer:
         cx = _W // 2
         cy = int(_H * 0.40)
         line1 = f"WORLD {world_display}"
-        line2 = f"{character}  x  {lives:02d}"
+        line2 = f"{character} x {lives:02d}"
         f.draw_shadow(self._screen, line1, cx - f.width(line1, FS_TITLE) // 2, cy, FS_TITLE)
         f.draw_shadow(self._screen, line2, cx - f.width(line2, FS_MED) // 2, cy + 50, FS_MED)
         pygame.display.flip()

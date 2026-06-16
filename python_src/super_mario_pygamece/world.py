@@ -47,7 +47,6 @@ from .player import BIG_SIZE, SMALL_SIZE, create_player, player_size_for
 from .theme import LevelTheme, theme_for
 from .settings import (
     AIR_ACCELERATION,
-    CAMERA_FOLLOW_SPEED,
     COYOTE_TIME,
     DEATH_ANIM_DURATION,
     ENEMY_DESPAWN_MARGIN,
@@ -1202,7 +1201,7 @@ class GameWorld:
         self.time_bonus_remaining = max(0, int(self.time_remaining))
         self.time_bonus_tick = 0.0
         self.skip_complete = False
-        self.events.append("complete")
+        self.events.append("castlecomplete" if self.is_castle else "complete")
 
     def _begin_flagpole_slide(self, goal: pygame.Rect, dt: float) -> None:
         # C++ MarioGame: kPoleHeight=10t, frac=clamp(1-(y-pole_top)/10t, 0,1)
