@@ -116,6 +116,22 @@ class Collectible:
 
 
 @dataclass(slots=True)
+class Spring:
+    rect: pygame.Rect
+    bounce_speed: float
+    anim_timer: float = 0.0
+    anim_phase: int = 0
+
+
+@dataclass(slots=True)
+class Vine:
+    rect: pygame.Rect
+    dest_level: str = ""
+    dest_world_x: float = 0.0
+    dest_world_y: float = 0.0
+
+
+@dataclass(slots=True)
 class EnemyProjectile:
     pos: pygame.Vector2
     velocity: pygame.Vector2

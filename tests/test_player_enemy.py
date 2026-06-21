@@ -4,7 +4,7 @@ import unittest
 
 from super_mario_pygamece.enemy import create_enemy, is_enemy_spawn
 from super_mario_pygamece.level import EntitySpawn
-from super_mario_pygamece.player import create_player
+from super_mario_pygamece.player import SMALL_SIZE, create_player
 from super_mario_pygamece.settings import ENEMY_SPEED, TILE_SIZE
 
 
@@ -14,7 +14,7 @@ class PlayerEnemyTests(unittest.TestCase):
 
         self.assertEqual(player.pos.x, 3 * TILE_SIZE)
         self.assertEqual(player.facing, 1)
-        self.assertEqual(player.size.y, 30)
+        self.assertEqual(player.size.y, SMALL_SIZE.y)
 
     def test_create_enemy_sets_walking_defaults(self) -> None:
         spawn = EntitySpawn(type="Goomba", x=8, y=13)

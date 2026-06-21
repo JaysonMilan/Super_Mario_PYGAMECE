@@ -1,138 +1,2431 @@
 {
-  "version": "1.0",
+  "background": [
+    {
+      "sprite": "cloud_left_top",
+      "type": "Cloud",
+      "x": 8,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_left_bot",
+      "type": "Cloud",
+      "x": 8,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_right_top",
+      "type": "Cloud",
+      "x": 9,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_right_bot",
+      "type": "Cloud",
+      "x": 9,
+      "y": 1
+    },
+    {
+      "sprite": "bush_left",
+      "type": "Bush",
+      "x": 11,
+      "y": 11
+    },
+    {
+      "sprite": "bush_center_0",
+      "type": "Bush",
+      "x": 12,
+      "y": 11
+    },
+    {
+      "sprite": "bush_center_0",
+      "type": "Bush",
+      "x": 13,
+      "y": 11
+    },
+    {
+      "sprite": "bush_center_0",
+      "type": "Bush",
+      "x": 14,
+      "y": 11
+    },
+    {
+      "sprite": "bush_right",
+      "type": "Bush",
+      "x": 15,
+      "y": 11
+    },
+    {
+      "sprite": "cloud_left_top",
+      "type": "Cloud",
+      "x": 19,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_left_bot",
+      "type": "Cloud",
+      "x": 19,
+      "y": 2
+    },
+    {
+      "sprite": "cloud_right_top",
+      "type": "Cloud",
+      "x": 20,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_right_bot",
+      "type": "Cloud",
+      "x": 20,
+      "y": 2
+    },
+    {
+      "sprite": "bush_left",
+      "type": "Bush",
+      "x": 23,
+      "y": 11
+    },
+    {
+      "sprite": "bush_center_0",
+      "type": "Bush",
+      "x": 24,
+      "y": 11
+    },
+    {
+      "sprite": "bush_right",
+      "type": "Bush",
+      "x": 25,
+      "y": 11
+    },
+    {
+      "sprite": "cloud_left_top",
+      "type": "Cloud",
+      "x": 27,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_left_bot",
+      "type": "Cloud",
+      "x": 27,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_center_top",
+      "type": "Cloud",
+      "x": 28,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_center_bot",
+      "type": "Cloud",
+      "x": 28,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_center_top",
+      "type": "Cloud",
+      "x": 29,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_center_bot",
+      "type": "Cloud",
+      "x": 29,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_right_top",
+      "type": "Cloud",
+      "x": 30,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_right_bot",
+      "type": "Cloud",
+      "x": 30,
+      "y": 1
+    },
+    {
+      "sprite": "bush_left",
+      "type": "Bush",
+      "x": 35,
+      "y": 11
+    },
+    {
+      "sprite": "cloud_left_top",
+      "type": "Cloud",
+      "x": 36,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_left_bot",
+      "type": "Cloud",
+      "x": 36,
+      "y": 2
+    },
+    {
+      "sprite": "bush_center_0",
+      "type": "Bush",
+      "x": 36,
+      "y": 11
+    },
+    {
+      "sprite": "cloud_right_top",
+      "type": "Cloud",
+      "x": 37,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_right_bot",
+      "type": "Cloud",
+      "x": 37,
+      "y": 2
+    },
+    {
+      "sprite": "bush_center_0",
+      "type": "Bush",
+      "x": 37,
+      "y": 11
+    },
+    {
+      "sprite": "bush_right",
+      "type": "Bush",
+      "x": 38,
+      "y": 11
+    },
+    {
+      "sprite": "cloud_left_top",
+      "type": "Cloud",
+      "x": 44,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_left_bot",
+      "type": "Cloud",
+      "x": 44,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_center_top",
+      "type": "Cloud",
+      "x": 45,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_center_bot",
+      "type": "Cloud",
+      "x": 45,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_right_top",
+      "type": "Cloud",
+      "x": 46,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_right_bot",
+      "type": "Cloud",
+      "x": 46,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_left_top",
+      "type": "Cloud",
+      "x": 56,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_left_bot",
+      "type": "Cloud",
+      "x": 56,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_right_top",
+      "type": "Cloud",
+      "x": 57,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_right_bot",
+      "type": "Cloud",
+      "x": 57,
+      "y": 1
+    },
+    {
+      "sprite": "bush_left",
+      "type": "Bush",
+      "x": 59,
+      "y": 11
+    },
+    {
+      "sprite": "bush_center_0",
+      "type": "Bush",
+      "x": 60,
+      "y": 11
+    },
+    {
+      "sprite": "bush_center_0",
+      "type": "Bush",
+      "x": 61,
+      "y": 11
+    },
+    {
+      "sprite": "bush_center_0",
+      "type": "Bush",
+      "x": 62,
+      "y": 11
+    },
+    {
+      "sprite": "bush_right",
+      "type": "Bush",
+      "x": 63,
+      "y": 11
+    },
+    {
+      "sprite": "cloud_left_top",
+      "type": "Cloud",
+      "x": 67,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_left_bot",
+      "type": "Cloud",
+      "x": 67,
+      "y": 2
+    },
+    {
+      "sprite": "cloud_right_top",
+      "type": "Cloud",
+      "x": 68,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_right_bot",
+      "type": "Cloud",
+      "x": 68,
+      "y": 2
+    },
+    {
+      "sprite": "bush_left",
+      "type": "Bush",
+      "x": 71,
+      "y": 11
+    },
+    {
+      "sprite": "bush_center_0",
+      "type": "Bush",
+      "x": 72,
+      "y": 11
+    },
+    {
+      "sprite": "bush_right",
+      "type": "Bush",
+      "x": 73,
+      "y": 11
+    },
+    {
+      "sprite": "cloud_left_top",
+      "type": "Cloud",
+      "x": 75,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_left_bot",
+      "type": "Cloud",
+      "x": 75,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_center_top",
+      "type": "Cloud",
+      "x": 76,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_center_bot",
+      "type": "Cloud",
+      "x": 76,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_center_top",
+      "type": "Cloud",
+      "x": 77,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_center_bot",
+      "type": "Cloud",
+      "x": 77,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_right_top",
+      "type": "Cloud",
+      "x": 78,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_right_bot",
+      "type": "Cloud",
+      "x": 78,
+      "y": 1
+    },
+    {
+      "sprite": "bush_left",
+      "type": "Bush",
+      "x": 83,
+      "y": 11
+    },
+    {
+      "sprite": "cloud_left_top",
+      "type": "Cloud",
+      "x": 84,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_left_bot",
+      "type": "Cloud",
+      "x": 84,
+      "y": 2
+    },
+    {
+      "sprite": "bush_center_0",
+      "type": "Bush",
+      "x": 84,
+      "y": 11
+    },
+    {
+      "sprite": "cloud_right_top",
+      "type": "Cloud",
+      "x": 85,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_right_bot",
+      "type": "Cloud",
+      "x": 85,
+      "y": 2
+    },
+    {
+      "sprite": "bush_center_0",
+      "type": "Bush",
+      "x": 85,
+      "y": 11
+    },
+    {
+      "sprite": "bush_right",
+      "type": "Bush",
+      "x": 86,
+      "y": 11
+    },
+    {
+      "sprite": "cloud_left_top",
+      "type": "Cloud",
+      "x": 92,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_left_bot",
+      "type": "Cloud",
+      "x": 92,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_center_top",
+      "type": "Cloud",
+      "x": 93,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_center_bot",
+      "type": "Cloud",
+      "x": 93,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_right_top",
+      "type": "Cloud",
+      "x": 94,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_right_bot",
+      "type": "Cloud",
+      "x": 94,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_left_top",
+      "type": "Cloud",
+      "x": 104,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_left_bot",
+      "type": "Cloud",
+      "x": 104,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_right_top",
+      "type": "Cloud",
+      "x": 105,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_right_bot",
+      "type": "Cloud",
+      "x": 105,
+      "y": 1
+    },
+    {
+      "sprite": "bush_left",
+      "type": "Bush",
+      "x": 107,
+      "y": 11
+    },
+    {
+      "sprite": "bush_center_0",
+      "type": "Bush",
+      "x": 108,
+      "y": 11
+    },
+    {
+      "sprite": "bush_center_0",
+      "type": "Bush",
+      "x": 109,
+      "y": 11
+    },
+    {
+      "sprite": "bush_center_0",
+      "type": "Bush",
+      "x": 110,
+      "y": 11
+    },
+    {
+      "sprite": "bush_right",
+      "type": "Bush",
+      "x": 111,
+      "y": 11
+    },
+    {
+      "sprite": "cloud_left_top",
+      "type": "Cloud",
+      "x": 115,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_left_bot",
+      "type": "Cloud",
+      "x": 115,
+      "y": 2
+    },
+    {
+      "sprite": "cloud_right_top",
+      "type": "Cloud",
+      "x": 116,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_right_bot",
+      "type": "Cloud",
+      "x": 116,
+      "y": 2
+    },
+    {
+      "sprite": "bush_left",
+      "type": "Bush",
+      "x": 119,
+      "y": 11
+    },
+    {
+      "sprite": "bush_center_0",
+      "type": "Bush",
+      "x": 120,
+      "y": 11
+    },
+    {
+      "sprite": "bush_right",
+      "type": "Bush",
+      "x": 121,
+      "y": 11
+    },
+    {
+      "sprite": "cloud_left_top",
+      "type": "Cloud",
+      "x": 123,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_left_bot",
+      "type": "Cloud",
+      "x": 123,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_center_top",
+      "type": "Cloud",
+      "x": 124,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_center_bot",
+      "type": "Cloud",
+      "x": 124,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_center_top",
+      "type": "Cloud",
+      "x": 125,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_center_bot",
+      "type": "Cloud",
+      "x": 125,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_right_top",
+      "type": "Cloud",
+      "x": 126,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_right_bot",
+      "type": "Cloud",
+      "x": 126,
+      "y": 1
+    },
+    {
+      "sprite": "bush_left",
+      "type": "Bush",
+      "x": 131,
+      "y": 11
+    },
+    {
+      "sprite": "cloud_left_top",
+      "type": "Cloud",
+      "x": 132,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_left_bot",
+      "type": "Cloud",
+      "x": 132,
+      "y": 2
+    },
+    {
+      "sprite": "bush_center_0",
+      "type": "Bush",
+      "x": 132,
+      "y": 11
+    },
+    {
+      "sprite": "cloud_right_top",
+      "type": "Cloud",
+      "x": 133,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_right_bot",
+      "type": "Cloud",
+      "x": 133,
+      "y": 2
+    },
+    {
+      "sprite": "bush_center_0",
+      "type": "Bush",
+      "x": 133,
+      "y": 11
+    },
+    {
+      "sprite": "bush_right",
+      "type": "Bush",
+      "x": 134,
+      "y": 11
+    },
+    {
+      "sprite": "cloud_left_top",
+      "type": "Cloud",
+      "x": 140,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_left_bot",
+      "type": "Cloud",
+      "x": 140,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_center_top",
+      "type": "Cloud",
+      "x": 141,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_center_bot",
+      "type": "Cloud",
+      "x": 141,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_right_top",
+      "type": "Cloud",
+      "x": 142,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_right_bot",
+      "type": "Cloud",
+      "x": 142,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_left_top",
+      "type": "Cloud",
+      "x": 152,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_left_bot",
+      "type": "Cloud",
+      "x": 152,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_right_top",
+      "type": "Cloud",
+      "x": 153,
+      "y": 0
+    },
+    {
+      "sprite": "cloud_right_bot",
+      "type": "Cloud",
+      "x": 153,
+      "y": 1
+    },
+    {
+      "sprite": "bush_left",
+      "type": "Bush",
+      "x": 155,
+      "y": 11
+    },
+    {
+      "sprite": "bush_center_0",
+      "type": "Bush",
+      "x": 156,
+      "y": 11
+    },
+    {
+      "sprite": "bush_center_0",
+      "type": "Bush",
+      "x": 157,
+      "y": 11
+    },
+    {
+      "sprite": "bush_center_0",
+      "type": "Bush",
+      "x": 158,
+      "y": 11
+    },
+    {
+      "sprite": "bush_right",
+      "type": "Bush",
+      "x": 159,
+      "y": 11
+    },
+    {
+      "sprite": "cloud_left_top",
+      "type": "Cloud",
+      "x": 163,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_left_bot",
+      "type": "Cloud",
+      "x": 163,
+      "y": 2
+    },
+    {
+      "sprite": "cloud_right_top",
+      "type": "Cloud",
+      "x": 164,
+      "y": 1
+    },
+    {
+      "sprite": "cloud_right_bot",
+      "type": "Cloud",
+      "x": 164,
+      "y": 2
+    }
+  ],
+  "cheep_spawners": [],
+  "entities": [
+    {
+      "type": "Coin",
+      "x": 28,
+      "y": 4
+    },
+    {
+      "type": "Coin",
+      "x": 29,
+      "y": 4
+    },
+    {
+      "type": "Coin",
+      "x": 30,
+      "y": 4
+    },
+    {
+      "type": "Coin",
+      "x": 48,
+      "y": 2
+    },
+    {
+      "type": "Coin",
+      "x": 49,
+      "y": 2
+    },
+    {
+      "type": "Coin",
+      "x": 50,
+      "y": 2
+    },
+    {
+      "type": "PlayerSpawn",
+      "x": 3,
+      "y": 13
+    },
+    {
+      "type": "RedKoopa",
+      "x": 20,
+      "y": 8
+    },
+    {
+      "type": "RedKoopa",
+      "x": 28,
+      "y": 6
+    },
+    {
+      "type": "RedKoopa",
+      "x": 38,
+      "y": 8
+    },
+    {
+      "type": "RedKoopa",
+      "x": 48,
+      "y": 4
+    },
+    {
+      "type": "RedKoopa",
+      "x": 57,
+      "y": 8
+    },
+    {
+      "type": "RedKoopa",
+      "x": 65,
+      "y": 6
+    },
+    {
+      "type": "Goal",
+      "x": 145,
+      "y": 13
+    }
+  ],
+  "falling_platforms": [],
+  "firebars": [],
+  "foreground": [
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 0,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 0,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 1,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 1,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 2,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 2,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 3,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 4,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 4,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 5,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 5,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 6,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 6,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 7,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 7,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 8,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 8,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 9,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 9,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 10,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 10,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 11,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 11,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 12,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 12,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 13,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 13,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 14,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 14,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 15,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 15,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 16,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 17,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 18,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 19,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 20,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 21,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 22,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 25,
+      "y": 8
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 26,
+      "y": 8
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 27,
+      "y": 8
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 28,
+      "y": 8
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 29,
+      "y": 8
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 30,
+      "y": 8
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 35,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 36,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 37,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 38,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 39,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 40,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 41,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 46,
+      "y": 6
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 47,
+      "y": 6
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 48,
+      "y": 6
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 49,
+      "y": 6
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 50,
+      "y": 6
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 51,
+      "y": 6
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 52,
+      "y": 6
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 55,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 56,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 57,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 58,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 59,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 62,
+      "y": 8
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 63,
+      "y": 8
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 64,
+      "y": 8
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 65,
+      "y": 8
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 66,
+      "y": 8
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 67,
+      "y": 8
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 70,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 71,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 72,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 73,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 74,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 75,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 76,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 85,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 86,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 87,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 88,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 89,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 90,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 91,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 92,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 93,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 94,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 100,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 100,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 101,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 101,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 102,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 102,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 103,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 103,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 104,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 104,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 105,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 105,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 106,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 106,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 107,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 107,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 108,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 108,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 109,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 109,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 110,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 110,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 111,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 111,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 112,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 112,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 113,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 113,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 114,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 114,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 115,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 115,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 116,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 116,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 117,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 117,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 118,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 118,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 119,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 119,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 120,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 120,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 121,
+      "y": 12
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 121,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 121,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 122,
+      "y": 11
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 122,
+      "y": 12
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 122,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 122,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 123,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 123,
+      "y": 11
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 123,
+      "y": 12
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 123,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 123,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 124,
+      "y": 9
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 124,
+      "y": 10
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 124,
+      "y": 11
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 124,
+      "y": 12
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 124,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 124,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 125,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 125,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 126,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 126,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 127,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 127,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 128,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 128,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 129,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 129,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 130,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 130,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 131,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 131,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 132,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 132,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 133,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 133,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 134,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 134,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 135,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 135,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 136,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 136,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 137,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 137,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 138,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 138,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 139,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 139,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 140,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 140,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 141,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 141,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 142,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 142,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 143,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 143,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 144,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 144,
+      "y": 14
+    },
+    {
+      "sprite": "end0_dot",
+      "type": "Cloud",
+      "x": 145,
+      "y": 1
+    },
+    {
+      "sprite": "end0_l",
+      "type": "Cloud",
+      "x": 145,
+      "y": 2
+    },
+    {
+      "sprite": "end0_l",
+      "type": "Cloud",
+      "x": 145,
+      "y": 3
+    },
+    {
+      "sprite": "end0_l",
+      "type": "Cloud",
+      "x": 145,
+      "y": 4
+    },
+    {
+      "sprite": "end0_l",
+      "type": "Cloud",
+      "x": 145,
+      "y": 5
+    },
+    {
+      "sprite": "end0_l",
+      "type": "Cloud",
+      "x": 145,
+      "y": 6
+    },
+    {
+      "sprite": "end0_l",
+      "type": "Cloud",
+      "x": 145,
+      "y": 7
+    },
+    {
+      "sprite": "end0_l",
+      "type": "Cloud",
+      "x": 145,
+      "y": 8
+    },
+    {
+      "sprite": "end0_l",
+      "type": "Cloud",
+      "x": 145,
+      "y": 9
+    },
+    {
+      "sprite": "end0_l",
+      "type": "Cloud",
+      "x": 145,
+      "y": 10
+    },
+    {
+      "sprite": "end0_l",
+      "type": "Cloud",
+      "x": 145,
+      "y": 11
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 145,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 146,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 146,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 147,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 147,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 148,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 148,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 149,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 149,
+      "y": 14
+    },
+    {
+      "sprite": "castle0_top0",
+      "type": "Castle",
+      "x": 150,
+      "y": 7
+    },
+    {
+      "sprite": "castle0_brick",
+      "type": "Castle",
+      "x": 150,
+      "y": 8
+    },
+    {
+      "sprite": "castle0_brick",
+      "type": "Castle",
+      "x": 150,
+      "y": 9
+    },
+    {
+      "sprite": "castle0_brick",
+      "type": "Castle",
+      "x": 150,
+      "y": 10
+    },
+    {
+      "sprite": "castle0_brick",
+      "type": "Castle",
+      "x": 150,
+      "y": 11
+    },
+    {
+      "sprite": "castle0_brick",
+      "type": "Castle",
+      "x": 150,
+      "y": 12
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 150,
+      "y": 14
+    },
+    {
+      "sprite": "castle0_top1",
+      "type": "Castle",
+      "x": 151,
+      "y": 7
+    },
+    {
+      "sprite": "castle0_brick",
+      "type": "Castle",
+      "x": 151,
+      "y": 8
+    },
+    {
+      "sprite": "castle0_brick",
+      "type": "Castle",
+      "x": 151,
+      "y": 9
+    },
+    {
+      "sprite": "castle0_brick",
+      "type": "Castle",
+      "x": 151,
+      "y": 10
+    },
+    {
+      "sprite": "castle0_brick",
+      "type": "Castle",
+      "x": 151,
+      "y": 11
+    },
+    {
+      "sprite": "castle0_brick",
+      "type": "Castle",
+      "x": 151,
+      "y": 12
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 151,
+      "y": 14
+    },
+    {
+      "sprite": "castle0_top0",
+      "type": "Castle",
+      "x": 152,
+      "y": 7
+    },
+    {
+      "sprite": "castle0_brick",
+      "type": "Castle",
+      "x": 152,
+      "y": 8
+    },
+    {
+      "sprite": "castle0_brick",
+      "type": "Castle",
+      "x": 152,
+      "y": 9
+    },
+    {
+      "sprite": "castle0_center_center_top",
+      "type": "Castle",
+      "x": 152,
+      "y": 10
+    },
+    {
+      "sprite": "castle0_center_center",
+      "type": "Castle",
+      "x": 152,
+      "y": 11
+    },
+    {
+      "sprite": "castle0_center_center",
+      "type": "Castle",
+      "x": 152,
+      "y": 12
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 152,
+      "y": 14
+    },
+    {
+      "sprite": "castle0_top1",
+      "type": "Castle",
+      "x": 153,
+      "y": 7
+    },
+    {
+      "sprite": "castle0_brick",
+      "type": "Castle",
+      "x": 153,
+      "y": 8
+    },
+    {
+      "sprite": "castle0_brick",
+      "type": "Castle",
+      "x": 153,
+      "y": 9
+    },
+    {
+      "sprite": "castle0_brick",
+      "type": "Castle",
+      "x": 153,
+      "y": 10
+    },
+    {
+      "sprite": "castle0_brick",
+      "type": "Castle",
+      "x": 153,
+      "y": 11
+    },
+    {
+      "sprite": "castle0_brick",
+      "type": "Castle",
+      "x": 153,
+      "y": 12
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 153,
+      "y": 14
+    },
+    {
+      "sprite": "castle0_top0",
+      "type": "Castle",
+      "x": 154,
+      "y": 7
+    },
+    {
+      "sprite": "castle0_brick",
+      "type": "Castle",
+      "x": 154,
+      "y": 8
+    },
+    {
+      "sprite": "castle0_brick",
+      "type": "Castle",
+      "x": 154,
+      "y": 9
+    },
+    {
+      "sprite": "castle0_brick",
+      "type": "Castle",
+      "x": 154,
+      "y": 10
+    },
+    {
+      "sprite": "castle0_brick",
+      "type": "Castle",
+      "x": 154,
+      "y": 11
+    },
+    {
+      "sprite": "castle0_brick",
+      "type": "Castle",
+      "x": 154,
+      "y": 12
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 154,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 155,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 155,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 156,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 156,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 157,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 157,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 158,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 158,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 159,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 159,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 160,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 160,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 161,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 161,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 162,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 162,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 163,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 163,
+      "y": 14
+    },
+    {
+      "sprite": "gnd_red_1",
+      "type": "Ground",
+      "x": 164,
+      "y": 13
+    },
+    {
+      "sprite": "gnd_red2",
+      "type": "Ground",
+      "x": 164,
+      "y": 14
+    }
+  ],
   "level": {
     "name": "World 1-3",
-    "description": "Original sky-platform placeholder stage.",
-    "width": 80,
+    "width": 165,
     "height": 15,
     "tile_size": 1.0,
-    "time_limit": 300,
     "level_type": "Overworld",
     "music": "assets/sounds/overworld.wav",
+    "time_limit": 300,
     "can_scroll_backward": false,
+    "description": "",
     "camera_bounds": {
       "min_x": 0.0,
-      "max_x": 80.0,
       "min_y": 0.0,
+      "max_x": 165.0,
       "max_y": 15.0
     }
   },
-  "background": [
-    {"type": "Cloud", "sprite": "cloud_left_top", "x": 8, "y": 2},
-    {"type": "Cloud", "sprite": "cloud_right_top", "x": 9, "y": 2},
-    {"type": "Cloud", "sprite": "cloud_left_top", "x": 34, "y": 1},
-    {"type": "Cloud", "sprite": "cloud_right_top", "x": 35, "y": 1},
-    {"type": "Cloud", "sprite": "cloud_left_top", "x": 58, "y": 2},
-    {"type": "Cloud", "sprite": "cloud_right_top", "x": 59, "y": 2}
-  ],
-  "foreground": [
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 0, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 1, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 2, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 3, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 4, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 5, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 6, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 7, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 8, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 9, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 10, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 11, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 12, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 13, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 14, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 15, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 16, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 17, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 18, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 19, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 20, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 21, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 22, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 23, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 24, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 25, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 26, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 27, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 28, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 29, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 30, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 31, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 32, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 33, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 34, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 35, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 36, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 37, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 38, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 39, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 40, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 41, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 42, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 43, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 44, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 45, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 46, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 47, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 48, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 49, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 50, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 51, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 52, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 53, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 54, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 55, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 56, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 57, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 58, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 59, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 60, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 61, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 62, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 63, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 64, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 65, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 66, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 67, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 68, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 69, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 70, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 71, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 72, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 73, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 74, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 75, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 76, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 77, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 78, "y": 13},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 79, "y": 13},
-    {"type": "QuestionBlock", "sprite": "blockq_0", "item_content": 1, "x": 12, "y": 9},
-    {"type": "QuestionBlock", "sprite": "blockq_0", "item_content": 0, "x": 13, "y": 9},
-    {"type": "QuestionBlock", "sprite": "blockq_0", "item_content": 3, "x": 38, "y": 8},
-    {"type": "Brick", "sprite": "brickred", "x": 37, "y": 8},
-    {"type": "Brick", "sprite": "brickred", "x": 39, "y": 8},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 24, "y": 10},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 25, "y": 10},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 26, "y": 10},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 52, "y": 10},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 53, "y": 10},
-    {"type": "Ground", "sprite": "gnd_red_1", "x": 54, "y": 10}
-  ],
-  "entities": [
-    {"type": "PlayerSpawn", "x": 3, "y": 13},
-    {"type": "Goomba", "x": 18, "y": 13},
-    {"type": "GreenKoopa", "x": 31, "y": 13},
-    {"type": "Goomba", "x": 46, "y": 13},
-    {"type": "KoopaTroopa", "x": 58, "y": 13},
-    {"type": "Goal", "x": 74, "y": 13}
-  ],
-  "moving_platforms": [
-    {"start_x": 27.0, "start_y": 9.5, "end_x": 34.0, "end_y": 9.5, "speed": 2.0, "width": 3.0, "ease_endpoints": true},
-    {"start_x": 55.0, "start_y": 9.5, "end_x": 63.0, "end_y": 9.5, "speed": 2.25, "width": 3.0, "ease_endpoints": true}
-  ],
-  "falling_platforms": [],
+  "moving_platforms": [],
   "seesaw_pairs": [],
-  "cheep_spawners": [],
   "upfires": [],
+  "version": 1.0,
   "warps": []
 }

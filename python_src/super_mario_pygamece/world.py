@@ -27,7 +27,9 @@ from .entities import (
     ScorePopup,
     SeesawPlatform,
     ShellState,
+    Spring,
     UpFire,
+    Vine,
 )
 from .level import (
     BRICK_TYPES,
@@ -138,6 +140,7 @@ class GameWorld:
         self.flagpole_target_y: float = 0.0
         self.gameover_timer = 0.0
         self.pending_level_warp: str | None = None
+        self.authentic_movement = False
         self.restart()
 
     @property
@@ -194,6 +197,9 @@ class GameWorld:
         }
         solid_tiles = [tile_rect(tile) for tile in self.level.foreground if is_solid_tile(tile)]
         self.solid_tiles: list[pygame.Rect] = solid_tiles
+        self.solid_tile_lookup: dict[tuple[int, int], pygame.Rect] = {
+            rect.topleft: rect for rect in solid_tiles
+        }
         self.collider = TileCollider(solid_tiles)
         # Non-solid foreground tiles (clouds, bushes, hills, castle) are scenery.
         self.decoration_tiles: list[tuple[pygame.Rect, str]] = [
@@ -215,10 +221,17 @@ class GameWorld:
         # JSON (0=coin, 1=mushroom, 2=fire flower, 3=star, 4=1up). Blocks without an
         # explicit content default to a coin.
         self.block_contents: dict[tuple[int, int], str] = {}
+        self.block_hits_remaining: dict[tuple[int, int], int] = {}
+        self.hidden_block_contents: dict[tuple[int, int], str] = {}
         for tile in self.level.foreground:
             if tile.type in QUESTION_TYPES:
                 key = (tile.x * TILE_SIZE, tile.y * TILE_SIZE)
                 self.block_contents[key] = ITEM_CONTENT_BY_ID.get(tile.item_content, "Coin")
+                if tile.item_content == 0 and tile.hits_remaining > 1:
+                    self.block_hits_remaining[key] = tile.hits_remaining
+            elif tile.type in {"HiddenBlock", "InvisibleBlock", "HiddenQuestionBlock"}:
+                key = (tile.x * TILE_SIZE, tile.y * TILE_SIZE)
+                self.hidden_block_contents[key] = ITEM_CONTENT_BY_ID.get(tile.item_content, "Coin")
         self.enemies: list[Enemy] = [
             create_enemy(entity) for entity in self.level.entities if is_enemy_spawn(entity)
         ]
@@ -227,6 +240,35 @@ class GameWorld:
             for entity in self.level.entities
             if is_collectible_spawn(entity)
         ]
+        self.springs: list[Spring] = [
+            Spring(
+                rect=pygame.Rect(
+                    round(entity.x * TILE_SIZE),
+                    round((entity.y - 1) * TILE_SIZE),
+                    TILE_SIZE,
+                    TILE_SIZE,
+                ),
+                bounce_speed=26.0 * TILE_SIZE,
+            )
+            for entity in self.level.entities
+            if entity.type == "Spring"
+        ]
+        self.vines: list[Vine] = [
+            Vine(
+                rect=pygame.Rect(
+                    round(entity.x * TILE_SIZE - TILE_SIZE * 0.25),
+                    round((entity.y - 3.0) * TILE_SIZE),
+                    round(TILE_SIZE * 0.5),
+                    round(TILE_SIZE * 3.0),
+                ),
+                dest_level=entity.dest_level,
+                dest_world_x=entity.dest_world_x,
+                dest_world_y=entity.dest_world_y,
+            )
+            for entity in self.level.entities
+            if entity.type == "Vine"
+        ]
+        self.active_vine: Vine | None = None
         self.goal_rects = tuple(goal_rect(entity) for entity in self.level.entities if entity.type == "Goal")
         # Castle axe: touching it drops Bowser and completes the castle level.
         self.axe_rects: list[pygame.Rect] = [
@@ -455,6 +497,12 @@ class GameWorld:
             self._update_camera(dt)
             return
 
+        if self.active_vine is not None:
+            self._update_vine_climb(keys, dt)
+            self._tick_effects(dt)
+            self._update_camera(dt)
+            return
+
         # C++ ComboState::tick — decay the stomp/kill combo window each frame
         if self.stomp_combo_timer > 0.0:
             self.stomp_combo_timer -= dt
@@ -467,10 +515,12 @@ class GameWorld:
             self.player.pos += self.on_platform.delta_pos
 
         self._update_player(keys, jump_pressed, jump_held, fire_pressed, dt)
+        self._try_start_vine_climb(keys)
         if self.player.pipe_state == PipeState.NONE:
             self._try_start_pipe_entry(keys)
         
         self._handle_platform_collisions()
+        self._update_springs(dt)
         
         self._update_enemies(dt)
         self._update_fireballs(dt)
@@ -481,6 +531,84 @@ class GameWorld:
         self._handle_goal(dt)
         self._tick_effects(dt)
         self._update_camera(dt)
+
+    def _update_springs(self, dt: float) -> None:
+        phase_duration = 4.0 / 60.0
+        player_rect = self.player.rect
+        for spring in self.springs:
+            if spring.anim_phase:
+                self.player.velocity.y = 0.0
+                self.player.pos.y = spring.rect.top - self.player.size.y
+                spring.anim_timer += dt
+                if spring.anim_timer < phase_duration:
+                    continue
+                spring.anim_timer -= phase_duration
+                spring.anim_phase += 1
+                if spring.anim_phase > 3:
+                    spring.anim_phase = 0
+                    spring.anim_timer = 0.0
+                    self.player.velocity.y = -spring.bounce_speed
+                    self.player.on_ground = False
+                    self.coyote_timer = 0.0
+                    self.events.append("jump")
+                continue
+
+            if self.player.velocity.y < 0.0:
+                continue
+            in_x = (
+                player_rect.right > spring.rect.left + 2
+                and player_rect.left < spring.rect.right - 2
+            )
+            if not in_x:
+                continue
+            foot_near_top = spring.rect.top <= player_rect.bottom <= spring.rect.top + 12
+            if foot_near_top:
+                self.player.pos.y = spring.rect.top - self.player.size.y
+                self.player.velocity.y = 0.0
+                self.player.on_ground = True
+                spring.anim_phase = 1
+                spring.anim_timer = 0.0
+                break
+
+    def _try_start_vine_climb(self, keys: KeyState) -> None:
+        if not (keys[pygame.K_UP] or keys[pygame.K_w] or keys[pygame.K_DOWN] or keys[pygame.K_s]):
+            return
+        player_rect = self.player.rect
+        for vine in self.vines:
+            if player_rect.colliderect(vine.rect):
+                self.active_vine = vine
+                self.player.velocity.update(0.0, 0.0)
+                self.player.on_ground = False
+                self.player.pos.x = vine.rect.centerx - self.player.size.x * 0.5
+                self.events.append("vine")
+                return
+
+    def _update_vine_climb(self, keys: KeyState, dt: float) -> None:
+        vine = self.active_vine
+        if vine is None:
+            return
+
+        climb_dir = 0
+        if keys[pygame.K_UP] or keys[pygame.K_w]:
+            climb_dir -= 1
+        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+            climb_dir += 1
+
+        self.player.velocity.update(0.0, 0.0)
+        self.player.pos.x = vine.rect.centerx - self.player.size.x * 0.5
+        self.player.pos.y += climb_dir * 96.0 * dt
+
+        min_y = vine.rect.top - self.player.size.y * 0.5
+        max_y = vine.rect.bottom - self.player.size.y
+        self.player.pos.y = max(min_y, min(max_y, self.player.pos.y))
+
+        if self.player.pos.y <= min_y + 0.5 and (vine.dest_level or vine.dest_world_x or vine.dest_world_y):
+            if vine.dest_level and vine.dest_level != self.level.meta.name:
+                self.pending_level_warp = vine.dest_level
+            else:
+                self.player.pos.x = vine.dest_world_x * TILE_SIZE
+                self.player.pos.y = vine.dest_world_y * TILE_SIZE
+            self.active_vine = None
 
     def _update_hazards(self, dt: float) -> None:
         # UpFire (C++ UpFireSystem: Resting→Rising→Descending with stepped eased speed + random rest)
@@ -628,6 +756,9 @@ class GameWorld:
             elif not self.player.on_ground:
                 acceleration = AIR_ACCELERATION
                 max_speed = RUN_SPEED  # C++: air always clamps to max_run_speed (keeps momentum)
+            elif self.authentic_movement:
+                acceleration = 640.0 if run_held else 480.0
+                max_speed = 304.0 if run_held else 144.0
             elif run_held:
                 acceleration = RUN_ACCELERATION  # C++ run_accel = 35 t/s²
             else:
@@ -635,7 +766,8 @@ class GameWorld:
             self.player.velocity.x = _approach(self.player.velocity.x, direction * max_speed, acceleration * dt)
         elif self.player.on_ground or self.underwater:
             # C++: ground friction on land; also always applied in underwater (updateUnderwaterHorizontalMovement)
-            self.player.velocity.x = _approach(self.player.velocity.x, 0.0, GROUND_FRICTION * dt)
+            friction = 560.0 if self.authentic_movement and self.player.on_ground else GROUND_FRICTION
+            self.player.velocity.x = _approach(self.player.velocity.x, 0.0, friction * dt)
 
         if self.underwater:
             # Swim: each jump press is an upward stroke (SDL3 underwater swim).
@@ -670,12 +802,15 @@ class GameWorld:
             _jump_cut = not jump_held and self.player.velocity.y < 0
             _grav = GRAVITY_CUT if _jump_cut else (GRAVITY_RISING if self.player.velocity.y < 0 else GRAVITY)
             self.player.velocity.y = min(self.player.velocity.y + _grav * dt, MAX_FALL_SPEED)
+        was_rising = self.player.velocity.y < 0
         head_hits = self.collider.move_and_collide(self.player, dt)
         if self.player.on_ground:
             self.coyote_timer = COYOTE_TIME
 
         for tile in head_hits:
             self._handle_block_hit(tile)
+        if was_rising and not head_hits:
+            self._try_hit_hidden_block()
 
         if self.player.pos.y > self.level.meta.height * TILE_SIZE + 200:
             self._kill_player(force=True)
@@ -983,6 +1118,16 @@ class GameWorld:
             return
         if tile_type in QUESTION_TYPES:
             content = self.block_contents.get(key, "Coin")
+            if content == "Coin" and self.block_hits_remaining.get(key, 1) > 1:
+                self.block_hits_remaining[key] -= 1
+                self.bumps.append(BlockBump(rect=pygame.Rect(tile_rect_), sprite=self.tile_sprites.get(key, "blockq_0")))
+                self.coins += 1
+                self.score += 200
+                self._spawn_block_coin(tile_rect_)
+                self._popup("200", tile_rect_.x, tile_rect_.y)
+                if not self._maybe_oneup():
+                    self.events.append("coin")
+                return
             # SMB convention: a mushroom upgrades to a fire flower if Mario is already big.
             if content == "Mushroom" and self.player.state is not PowerState.SMALL:
                 content = "FireFlower"
@@ -1010,6 +1155,8 @@ class GameWorld:
             # C++ BlockSystem: used blocks still play the bump reaction (no item given).
             self.bumps.append(BlockBump(rect=pygame.Rect(tile_rect_), sprite="blockq_used"))
             self.events.append("blockhit")
+        elif tile_type in {"HiddenBlock", "InvisibleBlock", "HiddenQuestionBlock"}:
+            self._reveal_hidden_block(tile_rect_)
         elif tile_type in BRICK_TYPES:
             if self.player.state is PowerState.SMALL:
                 self.bumps.append(BlockBump(rect=pygame.Rect(tile_rect_), sprite=self.tile_sprites.get(key, "brick1")))
@@ -1026,13 +1173,47 @@ class GameWorld:
         self.tile_types[key] = "UsedBlock"
         self.tile_sprites[key] = "blockq_used"
         self.block_contents.pop(key, None)
+        self.block_hits_remaining.pop(key, None)
 
     def _remove_tile(self, tile_rect_: pygame.Rect) -> None:
         key = (tile_rect_.x, tile_rect_.y)
         self.tile_sprites.pop(key, None)
         self.tile_types.pop(key, None)
         self.collider.remove(tile_rect_)
-        self.solid_tiles[:] = [tile for tile in self.solid_tiles if tile.topleft != tile_rect_.topleft]
+        self.solid_tile_lookup.pop(key, None)
+        self.solid_tiles[:] = self.solid_tile_lookup.values()
+
+    def _try_hit_hidden_block(self) -> None:
+        tx = self.player.rect.centerx // TILE_SIZE
+        ty = (self.player.rect.top - 1) // TILE_SIZE
+        key = (int(tx) * TILE_SIZE, int(ty) * TILE_SIZE)
+        if key not in self.hidden_block_contents:
+            return
+        self.player.pos.y = (int(ty) + 1) * TILE_SIZE
+        self.player.velocity.y = 0.0
+        self.player.head_hit = True
+        self._reveal_hidden_block(pygame.Rect(key[0], key[1], TILE_SIZE, TILE_SIZE))
+
+    def _reveal_hidden_block(self, tile_rect_: pygame.Rect) -> None:
+        key = (tile_rect_.x, tile_rect_.y)
+        content = self.hidden_block_contents.pop(key, "Coin")
+        self.tile_types[key] = "UsedBlock"
+        self.tile_sprites[key] = "blockq_used"
+        rect = pygame.Rect(tile_rect_)
+        self.solid_tile_lookup[key] = rect
+        self.solid_tiles[:] = self.solid_tile_lookup.values()
+        self.collider.add(rect)
+        self.bumps.append(BlockBump(rect=rect, sprite="blockq_used"))
+        if content == "Coin":
+            self.coins += 1
+            self.score += 200
+            self._spawn_block_coin(rect)
+            self._popup("200", rect.x, rect.y)
+            if not self._maybe_oneup():
+                self.events.append("coin")
+        else:
+            self._spawn_block_powerup(rect, content)
+            self.events.append("mushroomappear")
 
     def _spawn_block_coin(self, tile_rect_: pygame.Rect) -> None:
         # Visual feedback only — score/coin already counted.
@@ -1114,7 +1295,10 @@ class GameWorld:
         elif collectible.kind in {"FireFlower", "Flower"}:
             self.score += 1000
             self._popup("1000", collectible.rect.x, collectible.rect.y)
-            if self.player.state is not PowerState.FIRE:
+            if self.player.state is PowerState.SMALL:
+                self.player.invincible_timer = max(self.player.invincible_timer, INVINCIBILITY_TIME)
+                self._begin_powerup(PowerState.SUPER)
+            elif self.player.state is not PowerState.FIRE:
                 # C++: invincible + form change only when not already Fire.
                 self.player.invincible_timer = max(self.player.invincible_timer, INVINCIBILITY_TIME)
                 self._begin_powerup(PowerState.FIRE)

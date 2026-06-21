@@ -15,6 +15,8 @@ import pygame
 
 from super_mario_pygamece.app import AppState, PygameMario
 from super_mario_pygamece.paths import ProjectPaths
+from super_mario_pygamece.settings import STARTING_LIVES
+from super_mario_pygamece.world import WorldState
 
 
 class PygameMarioAppTests(unittest.TestCase):
@@ -68,6 +70,37 @@ class PygameMarioAppTests(unittest.TestCase):
         self.assertEqual(app.level.meta.name, "1-2")
         app._end_intermission()
         self.assertEqual(app.state, AppState.PLAYING)
+
+    def test_gameover_continue_restarts_current_stage(self) -> None:
+        root = _fixture_root("app_continue")
+        self.addCleanup(shutil.rmtree, root.parent, True)
+        paths = _write_project_fixture(root)
+        app = PygameMario(level_path=paths.find_level("1-2"), paths=paths, audio_enabled=False)
+        app.world.state = WorldState.GAMEOVER
+        app.world.gameover_timer = 0
+        app.world.lives = 0
+        app.world.score = 1234
+
+        app._continue_after_gameover()
+
+        self.assertEqual(app.state, AppState.PLAYING)
+        self.assertEqual(app.level.meta.name, "1-2")
+        self.assertEqual(app.world.state, WorldState.PLAYING)
+        self.assertEqual(app.world.lives, STARTING_LIVES)
+        self.assertEqual(app.world.score, 0)
+
+    def test_gameover_escape_returns_to_title(self) -> None:
+        root = _fixture_root("app_gameover_title")
+        self.addCleanup(shutil.rmtree, root.parent, True)
+        paths = _write_project_fixture(root)
+        app = PygameMario(level_path=paths.find_level("1-1"), paths=paths, audio_enabled=False)
+        app.world.state = WorldState.GAMEOVER
+        app.world.gameover_timer = 0
+
+        running, _, _ = app._handle_playing_key(pygame.K_ESCAPE, running=True, jump_pressed=False)
+
+        self.assertTrue(running)
+        self.assertEqual(app.state, AppState.TITLE)
 
 
 def _fixture_root(name: str) -> Path:

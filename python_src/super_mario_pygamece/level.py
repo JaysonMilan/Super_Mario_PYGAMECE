@@ -135,6 +135,7 @@ class Tile:
     type: str
     sprite: str
     item_content: int = 0
+    hits_remaining: int = 1
 
 
 @dataclass(frozen=True, slots=True)
@@ -142,6 +143,9 @@ class EntitySpawn:
     type: str
     x: float
     y: float
+    dest_level: str = ""
+    dest_world_x: float = 0.0
+    dest_world_y: float = 0.0
 
 
 @dataclass(frozen=True, slots=True)
@@ -308,6 +312,7 @@ def _parse_tile(raw: dict[str, Any]) -> Tile:
         type=tile_type,
         sprite=str(raw.get("sprite") or _default_tile_sprite(tile_type)),
         item_content=int(raw.get("item_content", 0) or 0),
+        hits_remaining=max(1, int(raw.get("hits_remaining", 1) or 1)),
     )
 
 
@@ -316,6 +321,9 @@ def _parse_entity(raw: dict[str, Any]) -> EntitySpawn:
         type=str(raw.get("type", "Unknown")),
         x=float(raw.get("x", 0)),
         y=float(raw.get("y", 0)),
+        dest_level=str(raw.get("dest_level", "")),
+        dest_world_x=float(raw.get("dest_world_x", 0.0)),
+        dest_world_y=float(raw.get("dest_world_y", 0.0)),
     )
 
 

@@ -7,7 +7,6 @@ import pygame
 from super_mario_pygamece.entities import PowerState, ShellState
 from super_mario_pygamece.level import EntitySpawn, LevelData, LevelMeta, Tile
 from super_mario_pygamece.settings import (
-    JUMP_SPEED,
     SHELL_KICK_SPEED,
     SHELL_WAKE_TIME,
     TILE_SIZE,
@@ -47,7 +46,7 @@ class EnemyTraitTests(unittest.TestCase):
 
         self.assertEqual(koopa.shell_state, ShellState.SHELL_STILL)
         self.assertGreaterEqual(koopa.shell_wake_timer, SHELL_WAKE_TIME - 0.01)
-        self.assertEqual(world.player.velocity.y, -JUMP_SPEED * 0.45)
+        self.assertEqual(world.player.velocity.y, -19.0 * TILE_SIZE)
 
     def test_kicking_a_still_shell_sends_it_flying(self) -> None:
         world = GameWorld(_level(EntitySpawn(type="GreenKoopa", x=10, y=13)))
@@ -99,6 +98,14 @@ class EnemyTraitTests(unittest.TestCase):
         world.update(_no_keys(), jump_pressed=False, jump_held=False, jump_released=False, dt=0.0)
 
         self.assertTrue(spiny.alive)  # spiny survives the stomp
+        self.assertTrue(world.player.is_shrinking)
+        self.assertEqual(world.player.pending_state, PowerState.SMALL)
+
+        for _ in range(60):
+            world.update(_no_keys(), jump_pressed=False, jump_held=False, jump_released=False, dt=1 / 60)
+            if not world.player.is_shrinking:
+                break
+
         self.assertEqual(world.player.state, PowerState.SMALL)
 
     def test_buzzy_beetle_is_fire_immune(self) -> None:

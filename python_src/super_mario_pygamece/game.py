@@ -37,6 +37,7 @@ FIRE_KEYS = {pygame.K_x, pygame.K_j}
 class PygameMario:
     def __init__(self, level_path: Path | None, paths: ProjectPaths, audio_enabled: bool = True) -> None:
         pygame.init()
+        pygame.joystick.init()
         pygame.display.set_caption("Super Mario PYGAMECE")
         self.screen = pygame.display.set_mode(SCREEN_SIZE)
         self.clock = pygame.time.Clock()
@@ -56,6 +57,14 @@ class PygameMario:
         self.level = self._load_level()
         self.player_count = 1
         self.world = GameWorld(self.level)
+        self.fullscreen = False
+        self.debug_overlay = False
+        self.authentic_mode = False
+        self._stage_availability_cache: list[list[bool]] | None = None
+        self._gamepad: pygame.joystick.JoystickType | None = None
+        self._gamepad_jump_held = False
+        self._gamepad_fire_held = False
+        self._detect_gamepad()
 
         # Intermission / victory state
         self._pending_world: GameWorld | None = None
@@ -92,7 +101,7 @@ class PygameMario:
 
             # ---- PLAYING fixed-step loop ----
             while self.state is AppState.PLAYING and accumulator >= FIXED_DT:
-                keys = pygame.key.get_pressed()
+                keys = self._combined_keys(pygame.key.get_pressed())
                 jump_held = any(keys[key] for key in JUMP_KEYS)
                 self.world.update(
                     keys, jump_pressed, jump_held, jump_released, FIXED_DT,
@@ -131,8 +140,7 @@ class PygameMario:
                     and self.world.gameover_timer <= 0
                     and (jump_pressed or fire_pressed)
                 ):
-                    self.world.restart(reset_score=True, player_count=self.player_count)
-                    self.state = AppState.TITLE
+                    self._continue_after_gameover()
                     jump_pressed = False
                     fire_pressed = False
                     break
@@ -196,6 +204,7 @@ class PygameMario:
         self.selected_level_index = self._initial_level_index(next_path)
         self.level = self._load_level()
         new_world = GameWorld(self.level)
+        new_world.authentic_movement = self.authentic_mode
         new_world.player_count = self.player_count
         new_world.sessions = sessions
         new_world.active_player_index = active
@@ -221,6 +230,7 @@ class PygameMario:
     def _end_intermission(self) -> None:
         if self._pending_world is not None:
             self.world = self._pending_world
+            self.world.authentic_movement = self.authentic_mode
             self._pending_world = None
         self.state = AppState.PLAYING
 
@@ -254,6 +264,7 @@ class PygameMario:
             self.level_path = found_path
             self.level = self._load_level()
             self.world = GameWorld(self.level)
+            self.world.authentic_movement = self.authentic_mode
             self.world.sessions = sessions
             self.world.active_player_index = active_player_index
             self.world.apply_from_session()
@@ -311,9 +322,50 @@ class PygameMario:
     ) -> tuple[bool, bool, bool, bool]:
         if event.type == pygame.QUIT:
             return False, jump_pressed, jump_released, fire_pressed
+        if event.type == pygame.JOYDEVICEADDED:
+            self._detect_gamepad()
+            return running, jump_pressed, jump_released, fire_pressed
+        if event.type == pygame.JOYDEVICEREMOVED:
+            self._detect_gamepad()
+            self._gamepad_jump_held = False
+            self._gamepad_fire_held = False
+            return running, jump_pressed, jump_released, fire_pressed
+        if event.type == pygame.JOYBUTTONDOWN:
+            if event.button in {0, 1}:
+                self._gamepad_jump_held = True
+                jump_pressed = True
+            elif event.button in {2, 3, 5}:
+                self._gamepad_fire_held = True
+                fire_pressed = True
+            elif event.button in {6, 7}:
+                if self.state is AppState.PLAYING:
+                    self.state = AppState.PAUSED
+                elif self.state is AppState.PAUSED:
+                    self.state = AppState.PLAYING
+            return running, jump_pressed, jump_released, fire_pressed
+        if event.type == pygame.JOYBUTTONUP:
+            if event.button in {0, 1}:
+                self._gamepad_jump_held = False
+                jump_released = True
+            elif event.button in {2, 3, 5}:
+                self._gamepad_fire_held = False
+            return running, jump_pressed, jump_released, fire_pressed
         if event.type == pygame.KEYUP and event.key in JUMP_KEYS:
             return running, jump_pressed, True, fire_pressed
         if event.type != pygame.KEYDOWN:
+            return running, jump_pressed, jump_released, fire_pressed
+
+        if event.key == pygame.K_F11 or (
+            event.key == pygame.K_RETURN and (event.mod & pygame.KMOD_ALT)
+        ):
+            self._toggle_fullscreen()
+            return running, jump_pressed, jump_released, fire_pressed
+        if event.key == pygame.K_F3:
+            self.debug_overlay = not self.debug_overlay
+            return running, jump_pressed, jump_released, fire_pressed
+        if event.key == pygame.K_F6:
+            self.authentic_mode = not self.authentic_mode
+            self.world.authentic_movement = self.authentic_mode
             return running, jump_pressed, jump_released, fire_pressed
 
         if self.state is AppState.TITLE:
@@ -377,6 +429,9 @@ class PygameMario:
         return running, jump_pressed
 
     def _stage_availability(self) -> list[list[bool]]:
+        if self._stage_availability_cache is not None:
+            return [row[:] for row in self._stage_availability_cache]
+
         import re
         available = [[False] * 4 for _ in range(8)]
         for p in self.level_paths:
@@ -385,7 +440,8 @@ class PygameMario:
                 w, s = int(m.group(1)) - 1, int(m.group(2)) - 1
                 if 0 <= w < 8 and 0 <= s < 4:
                     available[w][s] = True
-        return available
+        self._stage_availability_cache = available
+        return [row[:] for row in available]
 
     def _menu_move_world(self, direction: int) -> None:
         avail = self._stage_availability()
@@ -433,6 +489,17 @@ class PygameMario:
         jump_pressed: bool,
         fire_pressed: bool = False,
     ) -> tuple[bool, bool, bool]:
+        if self.world.state is WorldState.GAMEOVER and self.world.gameover_timer <= 0:
+            if key in {pygame.K_ESCAPE, pygame.K_TAB}:
+                self._return_to_title_after_gameover()
+                return running, jump_pressed, fire_pressed
+            if key in JUMP_KEYS:
+                jump_pressed = True
+                return running, jump_pressed, fire_pressed
+            if key in FIRE_KEYS:
+                fire_pressed = True
+                return running, jump_pressed, fire_pressed
+
         if key == pygame.K_ESCAPE:
             return False, jump_pressed, fire_pressed
         if key == pygame.K_p:
@@ -447,6 +514,15 @@ class PygameMario:
             fire_pressed = True
         return running, jump_pressed, fire_pressed
 
+    def _continue_after_gameover(self) -> None:
+        self.world.restart(reset_score=True, player_count=self.player_count)
+        self.world.authentic_movement = self.authentic_mode
+        self.state = AppState.PLAYING
+
+    def _return_to_title_after_gameover(self) -> None:
+        self.world.restart(reset_score=True, player_count=self.player_count)
+        self.state = AppState.TITLE
+
     def _move_level_selection(self, direction: int) -> None:
         if not self.level_paths:
             return
@@ -457,6 +533,7 @@ class PygameMario:
             self.level_path = self.level_paths[self.selected_level_index]
         self.level = self._load_level()
         new_world = GameWorld(self.level)
+        new_world.authentic_movement = self.authentic_mode
         new_world.restart(reset_score=True, player_count=self.player_count)
         self._pending_world = new_world
         character = "MARIO"
@@ -487,7 +564,7 @@ class PygameMario:
                 stage_available=self._stage_availability(),
             )
         elif self.state is AppState.PAUSED:
-            self.renderer.draw(self.world, paused=True)
+            self.renderer.draw(self.world, paused=True, debug=self.debug_overlay, fps=self.clock.get_fps())
         elif self.state is AppState.INTERMISSION:
             self.renderer.draw_intermission(
                 self.intermission_world_display,
@@ -497,7 +574,77 @@ class PygameMario:
         elif self.state is AppState.VICTORY:
             self.renderer.draw_victory(self.victory_timer)
         else:
-            self.renderer.draw(self.world)
+            self.renderer.draw(self.world, debug=self.debug_overlay, fps=self.clock.get_fps())
+
+    def _toggle_fullscreen(self) -> None:
+        self.fullscreen = not self.fullscreen
+        flags = pygame.FULLSCREEN if self.fullscreen else 0
+        self.screen = pygame.display.set_mode(SCREEN_SIZE, flags)
+        self.renderer.set_surface(self.screen)
+
+    def _detect_gamepad(self) -> None:
+        self._gamepad = None
+        if pygame.joystick.get_count() > 0:
+            self._gamepad = pygame.joystick.Joystick(0)
+            self._gamepad.init()
+
+    def _combined_keys(self, keyboard: pygame.key.ScancodeWrapper) -> _CombinedKeys:
+        left = right = up = down = False
+        if self._gamepad is not None:
+            try:
+                axis_x = self._gamepad.get_axis(0)
+                axis_y = self._gamepad.get_axis(1)
+                hat_x, hat_y = self._gamepad.get_hat(0) if self._gamepad.get_numhats() else (0, 0)
+                left = axis_x < -0.35 or hat_x < 0
+                right = axis_x > 0.35 or hat_x > 0
+                up = axis_y < -0.35 or hat_y > 0
+                down = axis_y > 0.35 or hat_y < 0
+            except pygame.error:
+                self._gamepad = None
+        return _CombinedKeys(
+            keyboard,
+            left=left,
+            right=right,
+            up=up,
+            down=down,
+            jump=self._gamepad_jump_held,
+            fire=self._gamepad_fire_held,
+        )
+
+
+class _CombinedKeys:
+    def __init__(
+        self,
+        keyboard: pygame.key.ScancodeWrapper,
+        *,
+        left: bool,
+        right: bool,
+        up: bool,
+        down: bool,
+        jump: bool,
+        fire: bool,
+    ) -> None:
+        self._keyboard = keyboard
+        self._pressed = {
+            pygame.K_LEFT: left,
+            pygame.K_a: left,
+            pygame.K_RIGHT: right,
+            pygame.K_d: right,
+            pygame.K_UP: up,
+            pygame.K_w: up,
+            pygame.K_DOWN: down,
+            pygame.K_s: down,
+            pygame.K_SPACE: jump,
+            pygame.K_z: jump,
+            pygame.K_k: jump,
+            pygame.K_x: fire,
+            pygame.K_j: fire,
+            pygame.K_LSHIFT: fire,
+            pygame.K_RSHIFT: fire,
+        }
+
+    def __getitem__(self, key: int) -> bool:
+        return bool(self._keyboard[key] or self._pressed.get(key, False))
 
 
 __all__ = ["AppState", "GameWorld", "PygameMario", "WorldState"]

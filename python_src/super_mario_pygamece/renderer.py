@@ -44,11 +44,14 @@ class Renderer:
         self._sprites = sprites
         self._font = font
 
+    def set_surface(self, screen: pygame.Surface) -> None:
+        self._screen = screen
+
     # ------------------------------------------------------------------
     # Main game draw
     # ------------------------------------------------------------------
 
-    def draw(self, world: GameWorld, paused: bool = False) -> None:
+    def draw(self, world: GameWorld, paused: bool = False, debug: bool = False, fps: float = 0.0) -> None:
         self._screen.fill(world.theme.sky)
         cam_x = round(world.camera_x)
         cam_y = round(world.camera_y)
@@ -63,6 +66,8 @@ class Renderer:
         self._draw_decorations(world, cam_x, cam_y, visible)
         self._draw_tiles(world, cam_x, cam_y, visible)
         self._draw_platforms(world, cam_x, cam_y, visible)
+        self._draw_vines(world, cam_x, cam_y, visible)
+        self._draw_springs(world, cam_x, cam_y, visible)
         self._draw_bumps(world, cam_x, cam_y, visible)
         self._draw_collectibles(world, cam_x, cam_y, visible)
         self._draw_enemies(world, cam_x, cam_y, visible)
@@ -83,6 +88,8 @@ class Renderer:
             self._draw_time_up()
         elif world.state is WorldState.GAMEOVER:
             self._draw_game_over(world)
+        if debug:
+            self._draw_debug_overlay(world, fps)
 
         pygame.display.flip()
 
@@ -278,8 +285,10 @@ class Renderer:
         lives_str = f"LIVES {world.lives:02d}"
         f.draw_shadow(self._screen, lives_str, cx - f.width(lives_str, FS_HUD) // 2, cy + 38, FS_HUD)
         if world.gameover_timer <= 0:
-            prompt = "PRESS JUMP OR RUN"
+            prompt = "JUMP/RUN CONTINUE"
             f.draw(self._screen, prompt, cx - f.width(prompt, FS_HUD) // 2, cy + 76, FS_HUD, _GREY_SUB)
+            title = "ESC TITLE"
+            f.draw(self._screen, title, cx - f.width(title, FS_SUB) // 2, cy + 102, FS_SUB, _GREY_SUB)
 
     def _draw_level_complete(self, world: GameWorld) -> None:
         f = self._font
@@ -362,26 +371,49 @@ class Renderer:
         # C++ HUDSystem: formatNumber(lives, 2) — just the 2-digit number, no "x" prefix
         f.draw_shadow(self._screen, f"{world.lives:02d}", HUD_X_LIVES, HUD_ROW2, fs)
 
+    def _draw_debug_overlay(self, world: GameWorld, fps: float) -> None:
+        f = self._font
+        lines = (
+            f"FPS {fps:05.1f}",
+            f"POS {world.player.pos.x / TILE_SIZE:06.2f},{world.player.pos.y / TILE_SIZE:06.2f}",
+            f"VEL {world.player.velocity.x / TILE_SIZE:06.2f},{world.player.velocity.y / TILE_SIZE:06.2f}",
+            f"ENT {len(world.enemies) + len(world.collectibles) + len(world.fireballs) + len(world.enemy_projectiles):03d}",
+            f"GRID {len(world.solid_tiles):04d}",
+        )
+        panel = pygame.Surface((260, 110), pygame.SRCALPHA)
+        panel.fill((0, 0, 0, 170))
+        self._screen.blit(panel, (8, 56))
+        for i, line in enumerate(lines):
+            f.draw(self._screen, line, 16, 64 + i * 18, FS_SUB, _WHITE)
+
     # ------------------------------------------------------------------
     # World rendering helpers (all accept cam_x, cam_y)
     # ------------------------------------------------------------------
 
     def _draw_background(self, world: GameWorld, cam_x: int, cam_y: int, visible: pygame.Rect) -> None:
         blits: list[tuple[pygame.Surface, tuple[int, int]]] = []
+        parallax_x = int(round(cam_x * 0.45))
         for tile_rect in world.background_tiles:
-            if not visible.colliderect(tile_rect):
-                continue
             sprite_name = world.background_sprites[tile_rect.topleft]
-            blits.append((self._sprites.get(sprite_name), (tile_rect.x - cam_x, tile_rect.y - cam_y)))
+            screen_x = tile_rect.x - parallax_x
+            screen_y = tile_rect.y - cam_y
+            if screen_x < -TILE_SIZE or screen_x > SCREEN_SIZE[0] + TILE_SIZE:
+                continue
+            blits.append((self._sprites.get(sprite_name), (screen_x, screen_y)))
         if blits:
             self._screen.blits(blits)
 
     def _draw_decorations(self, world: GameWorld, cam_x: int, cam_y: int, visible: pygame.Rect) -> None:
         blits: list[tuple[pygame.Surface, tuple[int, int]]] = []
+        parallax_x = int(round(cam_x * 0.72))
         for rect, sprite_name in world.decoration_tiles:
-            if not visible.colliderect(rect):
+            factor = 0.72 if sprite_name.startswith(("cloud", "hill", "bush")) else 1.0
+            draw_cam_x = parallax_x if factor < 1.0 else cam_x
+            screen_x = rect.x - draw_cam_x
+            screen_y = rect.y - cam_y
+            if screen_x < -TILE_SIZE or screen_x > SCREEN_SIZE[0] + TILE_SIZE:
                 continue
-            blits.append((self._sprites.get(sprite_name), (rect.x - cam_x, rect.y - cam_y)))
+            blits.append((self._sprites.get(sprite_name), (screen_x, screen_y)))
         if blits:
             self._screen.blits(blits)
 
@@ -443,6 +475,29 @@ class Renderer:
     # coin=0.6×0.75→19×24  star/flower/mushroom=0.75×0.75→24×24
     _COIN_SIZE = (19, 24)
     _SM_SIZE = (24, 24)   # star / mushroom / flower
+
+    def _draw_springs(self, world: GameWorld, cam_x: int, cam_y: int, visible: pygame.Rect) -> None:
+        blits: list[tuple[pygame.Surface, tuple[int, int]]] = []
+        phase_to_sprite = {1: "spring1_1", 2: "spring1_2", 3: "spring1_1"}
+        for spring in world.springs:
+            if not visible.colliderect(spring.rect):
+                continue
+            sprite = phase_to_sprite.get(spring.anim_phase, "spring1_0")
+            blits.append((self._sprites.get(sprite), (spring.rect.x - cam_x, spring.rect.y - cam_y)))
+        if blits:
+            self._screen.blits(blits)
+
+    def _draw_vines(self, world: GameWorld, cam_x: int, cam_y: int, visible: pygame.Rect) -> None:
+        vine_surf = self._sprites.get("vine", (16, 32))
+        blits: list[tuple[pygame.Surface, tuple[int, int]]] = []
+        for vine in world.vines:
+            if not visible.colliderect(vine.rect):
+                continue
+            segments = max(1, vine.rect.height // TILE_SIZE)
+            for i in range(segments):
+                blits.append((vine_surf, (vine.rect.x - cam_x, vine.rect.y + i * TILE_SIZE - cam_y)))
+        if blits:
+            self._screen.blits(blits)
 
     def _draw_collectibles(self, world: GameWorld, cam_x: int, cam_y: int, visible: pygame.Rect) -> None:
         for collectible in world.collectibles:
