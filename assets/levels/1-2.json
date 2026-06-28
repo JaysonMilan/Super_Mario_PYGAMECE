@@ -1,20 +1,20 @@
 {
-  "version": 1.0,
+  "version": 1,
   "level": {
     "name": "World 1-2",
     "width": 191,
     "height": 15,
-    "tile_size": 1.0,
+    "tile_size": 1,
     "level_type": "Underground",
     "music": "assets/sounds/underground.wav",
     "time_limit": 400,
     "can_scroll_backward": false,
     "description": "",
     "camera_bounds": {
-      "min_x": 0.0,
-      "min_y": 0.0,
-      "max_x": 191.0,
-      "max_y": 15.0
+      "min_x": 0,
+      "min_y": 0,
+      "max_x": 191,
+      "max_y": 15
     }
   },
   "foreground": [
@@ -3646,8 +3646,8 @@
     },
     {
       "type": "PlayerSpawn",
-      "x": 1,
-      "y": 13
+      "x": 2,
+      "y": 4
     },
     {
       "type": "Goomba",
