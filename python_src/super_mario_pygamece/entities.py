@@ -98,6 +98,8 @@ class Enemy:
     stomp_contact_active: bool = False
     level_spawn_active: bool = False
     shell_frames: tuple[str, ...] = ("koopa_shell_feet_0", "koopa_shell_feet_1")
+    walk_frames: tuple[str, ...] = ()
+    stomp_frame: str = ""
     fireball_hits: int = 0  # Bowser soaks several hits before going down
     star_immune: bool = False  # C++ star_vulnerable=false (Bowser, Podoboo)
     winged: bool = False  # para-koopas hop; first stomp strips the wings

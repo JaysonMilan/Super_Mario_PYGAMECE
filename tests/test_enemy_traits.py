@@ -216,6 +216,31 @@ class EnemyTraitTests(unittest.TestCase):
         self.assertFalse(shell.terrain_rebound_armed)
         self.assertFalse(shell.stomp_contact_active)
 
+    def test_level_theme_selects_goomba_squash_and_clamped_green_koopa_frames(self) -> None:
+        castle = GameWorld(
+            LevelData(
+                meta=LevelMeta(name="Test", width=32, height=15, level_type="Castle"),
+                foreground=(),
+                background=(),
+                entities=(EntitySpawn(type="PlayerSpawn", x=3, y=13), EntitySpawn(type="Goomba", x=10, y=13)),
+            )
+        )
+        underground = GameWorld(
+            LevelData(
+                meta=LevelMeta(name="Test", width=32, height=15, level_type="Underground"),
+                foreground=(),
+                background=(),
+                entities=(
+                    EntitySpawn(type="PlayerSpawn", x=3, y=13),
+                    EntitySpawn(type="GreenKoopa", x=10, y=13),
+                ),
+            )
+        )
+
+        self.assertEqual(castle.enemies[0].stomp_frame, "goombas2_ded")
+        self.assertEqual(underground.enemies[0].frames, ("koopa1_0", "koopa1_1"))
+        self.assertNotIn("koopa2", underground.enemies[0].frames)
+
 
 if __name__ == "__main__":
     unittest.main()

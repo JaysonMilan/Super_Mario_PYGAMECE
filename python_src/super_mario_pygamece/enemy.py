@@ -155,9 +155,11 @@ def create_enemy(spawn: EntitySpawn) -> Enemy:
     else:
         initial_ai_timer = 0.0
         initial_ai_phase = 0.0
+    frames = ENEMY_FRAMES.get(spawn.type, ("goombas_0", "goombas_1"))
     return Enemy(
         body=body,
-        frames=ENEMY_FRAMES.get(spawn.type, ("goombas_0", "goombas_1")),
+        frames=frames,
+        walk_frames=frames,
         kind=spawn.type,
         stompable=traits.get("stompable", True),
         fire_immune=traits.get("fire_immune", False),

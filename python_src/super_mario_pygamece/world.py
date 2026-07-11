@@ -235,6 +235,7 @@ class GameWorld:
         self.enemies: list[Enemy] = [
             create_enemy(entity) for entity in self.level.entities if is_enemy_spawn(entity)
         ]
+        self._apply_enemy_theme()
         self.collectibles: list[Collectible] = [
             create_collectible(entity)
             for entity in self.level.entities
@@ -399,6 +400,21 @@ class GameWorld:
         max_y = max(0.0, world_h - view_h)
         target = max(0.0, (world_h - view_h) * 0.5) - bias
         return min(max(target, 0.0), max_y)
+
+    def _apply_enemy_theme(self) -> None:
+        level_type = self.level.meta.level_type.lower()
+        variant = 2 if level_type == "castle" else 1 if level_type in {"underground", "bonus"} else 0
+        goomba_prefix = ("goombas", "goombas1", "goombas2")[variant]
+        koopa_prefix = "koopa" if variant == 0 else "koopa1"
+        for enemy in self.enemies:
+            if enemy.kind == "Goomba":
+                enemy.frames = (f"{goomba_prefix}_0", f"{goomba_prefix}_1")
+                enemy.walk_frames = enemy.frames
+                enemy.stomp_frame = f"{goomba_prefix}_ded"
+            elif enemy.kind in {"KoopaTroopa", "GreenKoopa"}:
+                enemy.frames = (f"{koopa_prefix}_0", f"{koopa_prefix}_1")
+                enemy.walk_frames = enemy.frames
+                enemy.shell_frames = (f"{koopa_prefix}_ded",)
 
     def update(
         self,
@@ -1524,7 +1540,7 @@ class GameWorld:
         enemy.stomp_chain = 1
         enemy.terrain_rebound_armed = False
         enemy.stomp_contact_active = False
-        enemy.frames = ENEMY_FRAMES.get(enemy.kind, enemy.frames)
+        enemy.frames = enemy.walk_frames or ENEMY_FRAMES.get(enemy.kind, enemy.frames)
 
     def _kick_shell(self, enemy: Enemy, direction: int) -> None:
         # Kicking awards no points (matches SDL3); only chained shell hits score.

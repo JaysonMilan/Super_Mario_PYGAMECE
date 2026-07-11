@@ -507,7 +507,7 @@ class Renderer:
             size = (TILE_SIZE, TILE_SIZE)
             if collectible.kind == "Coin":
                 phase = int(pygame.time.get_ticks() / 100) % 4
-                sprite = f"coin_an{phase}"
+                sprite = ("coin_use00", "coin_use01", "coin_use02", "coin_use01")[phase]
                 size = self._COIN_SIZE
             elif collectible.kind in {"FireFlower", "Flower"}:
                 phase = int(pygame.time.get_ticks() / 120) % 4
@@ -528,7 +528,7 @@ class Renderer:
             if not enemy.alive and enemy.death_timer <= 0:
                 continue
             if not enemy.alive:
-                dead_sprite = _ENEMY_DEAD_FRAMES.get(enemy.kind)
+                dead_sprite = enemy.stomp_frame or _ENEMY_DEAD_FRAMES.get(enemy.kind)
                 if dead_sprite:
                     self._blit_actor(dead_sprite, enemy.body.rect, cam_x, cam_y)
                 else:
