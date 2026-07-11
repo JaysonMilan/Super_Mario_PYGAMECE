@@ -528,12 +528,10 @@ class GameWorld:
             self.player.pos += self.on_platform.delta_pos
 
         if self.player.on_ground:
-            self.stomp_combo = 1
-            self.stomp_combo_timer = 0.0
+            self._reset_stomp_chains()
         self._update_player(keys, jump_pressed, jump_held, fire_pressed, dt)
         if self.player.on_ground:
-            self.stomp_combo = 1
-            self.stomp_combo_timer = 0.0
+            self._reset_stomp_chains()
         self._try_start_vine_climb(keys)
         if self.player.pipe_state == PipeState.NONE:
             self._try_start_pipe_entry(keys)
@@ -1555,6 +1553,14 @@ class GameWorld:
         enemy.stomp_contact_active = False
         enemy.kick_grace = 0.25  # matches SDL3: ~15 frames of contact immunity
         self.events.append("kick")
+
+    def _reset_stomp_chains(self) -> None:
+        # C++ PlayerStateSystem: landing resets the stomp combo AND every
+        # shell's bounce chain (resetShellStompChains).
+        self.stomp_combo = 1
+        self.stomp_combo_timer = 0.0
+        for enemy in self.enemies:
+            enemy.stomp_chain = 1
 
     def _award_combo_score(self, popup_x: int, popup_y: int) -> None:
         # C++ awardComboScore: shared across all kill types (stomp, star, shell).

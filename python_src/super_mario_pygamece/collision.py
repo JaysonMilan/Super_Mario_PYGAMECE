@@ -19,7 +19,7 @@ from .entities import (
     UpFire,
 )
 from .physics import TileCollider
-from .settings import SHELL_KICK_SPEED, TILE_SIZE
+from .settings import SHELL_KICK_SPEED, SHELL_WAKE_TIME, TILE_SIZE
 
 __all__ = ["TileCollider", "handle_entity_collisions", "handle_platform_collisions", "update_platforms"]
 
@@ -99,6 +99,8 @@ def handle_entity_collisions(world: CollisionWorld) -> None:
             if from_above:
                 if enemy.terrain_rebound_armed:
                     world.player.velocity.y = -19.0 * TILE_SIZE
+                    # C++ enterStationaryShell: refresh the 248-frame wake delay.
+                    enemy.shell_wake_timer = SHELL_WAKE_TIME
                     enemy.stomp_contact_active = True
                     world._begin_pending_shell_stomp_award(enemy)
                     world.events.append("stomp")
@@ -115,8 +117,16 @@ def handle_entity_collisions(world: CollisionWorld) -> None:
                     continue
                 world.player.velocity.y = -19.0 * TILE_SIZE  # C++ stomp_bounce = 19.0 t/s × 32
                 enemy.stomp_contact_active = True
-                enemy.body.velocity.x = -enemy.body.velocity.x or -SHELL_KICK_SPEED * enemy.body.facing
-                enemy.body.facing = -enemy.body.facing
+                if enemy.terrain_rebound_armed:
+                    # C++ handleShellStomp: an armed shell reverses instead of stopping.
+                    enemy.body.velocity.x = -enemy.body.velocity.x or -SHELL_KICK_SPEED * enemy.body.facing
+                    enemy.body.facing = -enemy.body.facing
+                else:
+                    # C++ enterStationaryShell: stomping an un-armed moving shell stops it.
+                    enemy.shell_state = ShellState.SHELL_STILL
+                    enemy.shell_wake_timer = SHELL_WAKE_TIME
+                    enemy.body.velocity.update(0.0, 0.0)
+                    enemy.kick_streak = 0
                 world._begin_pending_shell_stomp_award(enemy)
                 world.events.append("stomp")  # C++ enterStationaryShell → PlaySoundEvent "stomp"
             elif enemy.kick_grace <= 0 and world.player.invincible_timer <= 0:

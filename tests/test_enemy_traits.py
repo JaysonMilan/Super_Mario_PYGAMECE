@@ -217,6 +217,62 @@ class EnemyTraitTests(unittest.TestCase):
         self.assertFalse(shell.terrain_rebound_armed)
         self.assertFalse(shell.stomp_contact_active)
 
+    def test_stomping_unarmed_moving_shell_stops_it(self) -> None:
+        # C++ enterStationaryShell: only an armed shell reverses; un-armed stops.
+        world = GameWorld(_level(EntitySpawn(type="GreenKoopa", x=10, y=13)))
+        shell = world.enemies[0]
+        shell.level_spawn_active = True
+        world._convert_to_shell(shell)
+        shell.shell_state = ShellState.SHELL_KICKED
+        shell.body.velocity.x = SHELL_KICK_SPEED
+        shell.body.facing = 1
+        shell.kick_streak = 3
+        world.player.pos.x = shell.body.pos.x
+        world.player.pos.y = shell.body.pos.y - world.player.size.y + 2
+        world.player.velocity.y = 200.0
+
+        world._handle_entity_collisions()
+
+        self.assertEqual(shell.shell_state, ShellState.SHELL_STILL)
+        self.assertEqual(shell.body.velocity.x, 0.0)
+        self.assertEqual(shell.shell_wake_timer, SHELL_WAKE_TIME)
+        self.assertEqual(shell.kick_streak, 0)
+
+        world.player.on_ground = False
+        world.player.pos.y -= 16
+        world.player.velocity.y = -20
+        world._process_pending_shell_stomp_award()
+        self.assertEqual(world.score, 0)
+
+    def test_stomping_stationary_armed_shell_refreshes_wake_timer(self) -> None:
+        world = GameWorld(_level(EntitySpawn(type="GreenKoopa", x=10, y=13)))
+        shell = world.enemies[0]
+        shell.level_spawn_active = True
+        world._convert_to_shell(shell)
+        shell.terrain_rebound_armed = True
+        shell.shell_wake_timer = 0.5
+        world.player.pos.x = shell.body.pos.x
+        world.player.pos.y = shell.body.pos.y - world.player.size.y + 2
+        world.player.velocity.y = 200.0
+
+        world._handle_entity_collisions()
+
+        self.assertEqual(shell.shell_state, ShellState.SHELL_STILL)
+        self.assertEqual(shell.shell_wake_timer, SHELL_WAKE_TIME)
+        self.assertIsNotNone(world.pending_shell_stomp)
+
+    def test_landing_resets_shell_stomp_chain(self) -> None:
+        world = GameWorld(_level(EntitySpawn(type="GreenKoopa", x=10, y=13)))
+        shell = world.enemies[0]
+        shell.stomp_chain = 5
+        world.stomp_combo = 4
+        world.player.on_ground = True
+
+        world.update(_no_keys(), jump_pressed=False, jump_held=False, jump_released=False, dt=1 / 60)
+
+        self.assertEqual(shell.stomp_chain, 1)
+        self.assertEqual(world.stomp_combo, 1)
+
     def test_level_theme_selects_goomba_squash_and_clamped_green_koopa_frames(self) -> None:
         castle = GameWorld(
             LevelData(
