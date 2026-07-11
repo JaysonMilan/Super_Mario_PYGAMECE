@@ -109,6 +109,7 @@ class Enemy:
     ai_timer: float = 0.0
     home_x: float = 0.0
     home_y: float = 0.0
+    spawn_velocity: pygame.Vector2 = field(default_factory=pygame.Vector2)
 
 
 @dataclass(slots=True)

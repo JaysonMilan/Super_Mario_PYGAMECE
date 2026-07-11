@@ -174,6 +174,7 @@ def create_enemy(spawn: EntitySpawn) -> Enemy:
         shell_frames=SHELL_FRAMES.get(spawn.type, ("koopa_ded",)),
         ai_timer=initial_ai_timer,
         ai_phase=initial_ai_phase,
+        spawn_velocity=pygame.Vector2(velocity),
     )
 
 

@@ -980,6 +980,7 @@ class GameWorld:
                     enemy.body.velocity.update(0.0, 0.0)
                     continue
                 enemy.level_spawn_active = True
+                enemy.body.velocity.update(enemy.spawn_velocity)
 
             enemy.age += dt
             if enemy.kick_grace > 0:

@@ -157,6 +157,7 @@ class EnemyTraitTests(unittest.TestCase):
         world.player.pos.x = 15 * TILE_SIZE
         world.update(_no_keys(), jump_pressed=False, jump_held=False, jump_released=False, dt=0.0)
         self.assertTrue(goomba.level_spawn_active)
+        self.assertLess(goomba.body.velocity.x, 0)
 
     def test_shell_stomp_reverses_and_awards_after_visible_bounce(self) -> None:
         world = GameWorld(_level(EntitySpawn(type="GreenKoopa", x=10, y=13)))
