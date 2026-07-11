@@ -287,6 +287,8 @@ class GameWorld:
                 speed=p.speed * TILE_SIZE,
                 ease_endpoints=p.ease_endpoints,
                 ease_distance=p.ease_distance,
+                loop_mode=p.loop_mode,
+                t=p.phase,
             )
             for p in self.level.moving_platforms
         ]
@@ -359,8 +361,9 @@ class GameWorld:
         self.respawn_timer = 0.0
         self.coyote_timer = COYOTE_TIME
         self.jump_buffer_timer = 0.0
-        self.stomp_combo: int = 1        # C++ ComboState::combo; resets to 1 after kComboWindow
-        self.stomp_combo_timer: float = 0.0  # C++ kComboWindow = 0.67s
+        self.stomp_combo = 1
+        self.stomp_combo_timer = 0.0
+        self.pending_shell_stomp: tuple[Enemy, int, int, float, int] | None = None
         self.time_remaining = float(self.level.meta.time_limit)
         self._low_time_warned = False
         self.complete_timer = 0.0
@@ -504,17 +507,17 @@ class GameWorld:
             return
 
         # C++ ComboState::tick — decay the stomp/kill combo window each frame
-        if self.stomp_combo_timer > 0.0:
-            self.stomp_combo_timer -= dt
-            if self.stomp_combo_timer <= 0.0:
-                self.stomp_combo = 1
-                self.stomp_combo_timer = 0.0
-
         self._update_platforms(dt)
         if self.on_platform:
             self.player.pos += self.on_platform.delta_pos
 
+        if self.player.on_ground:
+            self.stomp_combo = 1
+            self.stomp_combo_timer = 0.0
         self._update_player(keys, jump_pressed, jump_held, fire_pressed, dt)
+        if self.player.on_ground:
+            self.stomp_combo = 1
+            self.stomp_combo_timer = 0.0
         self._try_start_vine_climb(keys)
         if self.player.pipe_state == PipeState.NONE:
             self._try_start_pipe_entry(keys)
@@ -523,6 +526,7 @@ class GameWorld:
         self._update_springs(dt)
         
         self._update_enemies(dt)
+        self._process_pending_shell_stomp_award()
         self._update_fireballs(dt)
         self._update_enemy_projectiles(dt)
         self._update_collectibles(dt)
@@ -953,6 +957,14 @@ class GameWorld:
                 enemy.alive = False
                 continue
 
+            if not enemy.level_spawn_active:
+                player_x_tiles = self.player.pos.x / TILE_SIZE
+                enemy_x_tiles = enemy.body.pos.x / TILE_SIZE
+                if not player_x_tiles - 4.0 <= enemy_x_tiles <= player_x_tiles + 10.0:
+                    enemy.body.velocity.update(0.0, 0.0)
+                    continue
+                enemy.level_spawn_active = True
+
             enemy.age += dt
             if enemy.kick_grace > 0:
                 enemy.kick_grace = max(0.0, enemy.kick_grace - dt)
@@ -964,7 +976,7 @@ class GameWorld:
 
         # Kicked-shell vs other-enemy collisions (cascading combo scoring).
         for shell in self.enemies:
-            if not shell.alive or shell.shell_state is not ShellState.SHELL_KICKED:
+            if not shell.alive or not shell.level_spawn_active or shell.shell_state is not ShellState.SHELL_KICKED:
                 continue
             # C++ ComboState::kComboWindow=0.67s: reset streak when window expires.
             if shell.kick_streak > 0 and shell.combo_timer > 0:
@@ -972,7 +984,7 @@ class GameWorld:
                 if shell.combo_timer <= 0:
                     shell.kick_streak = 0
             for other in self.enemies:
-                if other is shell or not other.alive:
+                if other is shell or not other.alive or not other.level_spawn_active:
                     continue
                 if other.shell_state is ShellState.SHELL_KICKED:
                     continue
@@ -1167,6 +1179,8 @@ class GameWorld:
                 self._spawn_brick_particles(tile_rect_, sprite)
                 self.score += 50
                 self.events.append("blockbreak")
+        else:
+            self.events.append("blockbump")
 
     def _convert_to_used(self, tile_rect_: pygame.Rect) -> None:
         key = (tile_rect_.x, tile_rect_.y)
@@ -1507,6 +1521,9 @@ class GameWorld:
             enemy.body.pos.y -= grow
             enemy.body.size.y = 28
         enemy.body.velocity.x = -ENEMY_SPEED if enemy.body.facing < 0 else ENEMY_SPEED
+        enemy.stomp_chain = 1
+        enemy.terrain_rebound_armed = False
+        enemy.stomp_contact_active = False
         enemy.frames = ENEMY_FRAMES.get(enemy.kind, enemy.frames)
 
     def _kick_shell(self, enemy: Enemy, direction: int) -> None:
@@ -1516,17 +1533,66 @@ class GameWorld:
         enemy.body.facing = direction
         enemy.kick_streak = 0
         enemy.combo_timer = 0.0
+        enemy.stomp_chain = 1
+        enemy.terrain_rebound_armed = False
+        enemy.stomp_contact_active = False
         enemy.kick_grace = 0.25  # matches SDL3: ~15 frames of contact immunity
         self.events.append("kick")
 
     def _award_combo_score(self, popup_x: int, popup_y: int) -> None:
         # C++ awardComboScore: shared across all kill types (stomp, star, shell).
-        idx = min(self.stomp_combo - 1, len(STOMP_COMBO_SCORES) - 1)
-        bonus = STOMP_COMBO_SCORES[idx]
-        self.score += bonus
-        self._popup(str(bonus), popup_x, popup_y)
+        if self.stomp_combo > len(STOMP_COMBO_SCORES):
+            self.lives = min(self.lives + 1, 128)
+            self._popup("1UP", popup_x, popup_y)
+            self.events.append("oneup")
+        else:
+            bonus = STOMP_COMBO_SCORES[self.stomp_combo - 1]
+            self.score += bonus
+            self._popup(str(bonus), popup_x, popup_y)
         self.stomp_combo += 1
-        self.stomp_combo_timer = 0.67  # C++ kComboWindow
+
+    def _begin_pending_shell_stomp_award(self, shell: Enemy) -> None:
+        self.pending_shell_stomp = (
+            shell,
+            shell.body.rect.x,
+            shell.body.rect.y,
+            self.player.pos.y,
+            0,
+        )
+
+    def _process_pending_shell_stomp_award(self) -> None:
+        if self.pending_shell_stomp is None:
+            return
+        shell, popup_x, popup_y, bounce_start_y, frames_waited = self.pending_shell_stomp
+        frames_waited += 1
+        airborne = not self.player.on_ground
+        visibly_bounced = self.player.pos.y <= bounce_start_y - 0.45 * TILE_SIZE
+        if (
+            shell.alive
+            and shell.terrain_rebound_armed
+            and airborne
+            and self.player.velocity.y < -0.5 * TILE_SIZE
+            and visibly_bounced
+        ):
+            if shell.stomp_chain > len(STOMP_COMBO_SCORES):
+                self.lives = min(self.lives + 1, 128)
+                self._popup("1UP", popup_x, popup_y)
+                self.events.append("oneup")
+            else:
+                bonus = STOMP_COMBO_SCORES[shell.stomp_chain - 1]
+                self.score += bonus
+                self._popup(str(bonus), popup_x, popup_y)
+            shell.stomp_chain += 1
+            self.pending_shell_stomp = None
+        elif (
+            not shell.alive
+            or not airborne
+            or self.player.velocity.y >= -0.5 * TILE_SIZE
+            or frames_waited > 20
+        ):
+            self.pending_shell_stomp = None
+        else:
+            self.pending_shell_stomp = (shell, popup_x, popup_y, bounce_start_y, frames_waited)
 
     def sync_to_session(self) -> None:
         if not self.sessions:

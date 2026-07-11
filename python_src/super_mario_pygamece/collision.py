@@ -19,7 +19,7 @@ from .entities import (
     UpFire,
 )
 from .physics import TileCollider
-from .settings import SHELL_WAKE_TIME, TILE_SIZE
+from .settings import SHELL_KICK_SPEED, TILE_SIZE
 
 __all__ = ["TileCollider", "handle_entity_collisions", "handle_platform_collisions", "update_platforms"]
 
@@ -38,6 +38,7 @@ class CollisionWorld(Protocol):
     def _collect(self, collectible: Collectible) -> None: ...
     def _convert_to_shell(self, enemy: Enemy) -> None: ...
     def _kick_shell(self, enemy: Enemy, direction: int) -> None: ...
+    def _begin_pending_shell_stomp_award(self, enemy: Enemy) -> None: ...
     def _kill_enemy(
         self,
         enemy: Enemy,
@@ -54,6 +55,10 @@ class CollisionWorld(Protocol):
 def handle_entity_collisions(world: CollisionWorld) -> None:
     player_rect = world.player.rect
 
+    for enemy in world.enemies:
+        if enemy.stomp_contact_active and not player_rect.colliderect(enemy.body.rect):
+            enemy.stomp_contact_active = False
+
     if world.player.invincible_timer <= 0 and world.player.star_timer <= 0:
         for fire in world.upfires:
             if fire.state != 0 and player_rect.colliderect(fire.rect):
@@ -66,7 +71,7 @@ def handle_entity_collisions(world: CollisionWorld) -> None:
                     return
 
     for enemy in world.enemies:
-        if not enemy.alive or not player_rect.colliderect(enemy.body.rect):
+        if not enemy.alive or not enemy.level_spawn_active or not player_rect.colliderect(enemy.body.rect):
             continue
         # C++ isStompingEnemy: vy > 0.5 t/s (16px/s), player bottom above enemy center,
         # and feet within [-0.1t, 0.4t] = [-3.2, 12.8] px of enemy top.
@@ -92,19 +97,27 @@ def handle_entity_collisions(world: CollisionWorld) -> None:
 
         if enemy.shell_state is ShellState.SHELL_STILL:
             if from_above:
+                if enemy.terrain_rebound_armed:
+                    world.player.velocity.y = -19.0 * TILE_SIZE
+                    enemy.stomp_contact_active = True
+                    world._begin_pending_shell_stomp_award(enemy)
+                    world.events.append("stomp")
+                    continue
                 world.player.velocity.y = -19.0 * TILE_SIZE  # C++ stomp_bounce = 19.0 t/s × 32
                 # C++ kickShell: direction = (player_x < enemy_x) ? 1 : -1 (kick away from player)
-                world._kick_shell(enemy, direction=1 if world.player.pos.x < enemy.body.pos.x else -1)
+                world._kick_shell(enemy, direction=1 if world.player.pos.x <= enemy.body.pos.x else -1)
             else:
-                world._kick_shell(enemy, direction=1 if world.player.pos.x < enemy.body.pos.x else -1)
+                world._kick_shell(enemy, direction=1 if world.player.pos.x <= enemy.body.pos.x else -1)
             continue
         if enemy.shell_state is ShellState.SHELL_KICKED:
             if from_above:
+                if enemy.stomp_contact_active:
+                    continue
                 world.player.velocity.y = -19.0 * TILE_SIZE  # C++ stomp_bounce = 19.0 t/s × 32
-                enemy.shell_state = ShellState.SHELL_STILL
-                enemy.shell_wake_timer = SHELL_WAKE_TIME
-                enemy.body.velocity.update(0.0, 0.0)
-                enemy.kick_streak = 0
+                enemy.stomp_contact_active = True
+                enemy.body.velocity.x = -enemy.body.velocity.x or -SHELL_KICK_SPEED * enemy.body.facing
+                enemy.body.facing = -enemy.body.facing
+                world._begin_pending_shell_stomp_award(enemy)
                 world.events.append("stomp")  # C++ enterStationaryShell → PlaySoundEvent "stomp"
             elif enemy.kick_grace <= 0 and world.player.invincible_timer <= 0:
                 world._take_damage()
@@ -148,7 +161,7 @@ def handle_entity_collisions(world: CollisionWorld) -> None:
         if not fireball.alive:
             continue
         for enemy in world.enemies:
-            if not enemy.alive or not fireball.rect.colliderect(enemy.body.rect):
+            if not enemy.alive or not enemy.level_spawn_active or not fireball.rect.colliderect(enemy.body.rect):
                 continue
             if enemy.fire_immune:
                 fireball.alive = False
@@ -211,6 +224,12 @@ def update_platforms(world: PlatformWorld, dt: float) -> None:
                     effective_speed *= 0.5
 
             p.t += (effective_speed / dist) * dt * p.direction
+            if p.loop_mode and p.t >= 1.0:
+                p.t = 0.0
+                p.direction = 1
+                p.pos = pygame.Vector2(p.start_pos)
+                p.delta_pos.update(0.0, 0.0)
+                continue
             if p.t >= 1.0:
                 p.t = 1.0
                 p.direction = -1

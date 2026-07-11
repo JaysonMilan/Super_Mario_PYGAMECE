@@ -144,6 +144,78 @@ class EnemyTraitTests(unittest.TestCase):
         # Sanity: traits dict drives the difference.
         self.assertIn("ledge_aware", ENEMY_TRAITS["RedKoopa"])
 
+    def test_dormant_enemy_stays_inert_until_player_is_near(self) -> None:
+        world = GameWorld(_level(EntitySpawn(type="Goomba", x=20, y=13)))
+        goomba = world.enemies[0]
+        start = pygame.Vector2(goomba.body.pos)
+
+        world.update(_no_keys(), jump_pressed=False, jump_held=False, jump_released=False, dt=1 / 60)
+
+        self.assertFalse(goomba.level_spawn_active)
+        self.assertEqual(goomba.body.pos, start)
+
+        world.player.pos.x = 15 * TILE_SIZE
+        world.update(_no_keys(), jump_pressed=False, jump_held=False, jump_released=False, dt=0.0)
+        self.assertTrue(goomba.level_spawn_active)
+
+    def test_shell_stomp_reverses_and_awards_after_visible_bounce(self) -> None:
+        world = GameWorld(_level(EntitySpawn(type="GreenKoopa", x=10, y=13)))
+        shell = world.enemies[0]
+        shell.level_spawn_active = True
+        world._convert_to_shell(shell)
+        shell.shell_state = ShellState.SHELL_KICKED
+        shell.body.velocity.x = SHELL_KICK_SPEED
+        shell.body.facing = 1
+        shell.terrain_rebound_armed = True
+        world.player.pos.x = shell.body.pos.x
+        world.player.pos.y = shell.body.pos.y - world.player.size.y + 2
+        world.player.velocity.y = 200.0
+
+        world._handle_entity_collisions()
+
+        self.assertEqual(shell.shell_state, ShellState.SHELL_KICKED)
+        self.assertLess(shell.body.velocity.x, 0)
+        self.assertIsNotNone(world.pending_shell_stomp)
+
+        world.player.on_ground = False
+        world.player.pos.y -= 16
+        world.player.velocity.y = -20
+        world._process_pending_shell_stomp_award()
+
+        self.assertEqual(world.score, 100)
+        self.assertEqual(shell.stomp_chain, 2)
+
+    def test_shell_stomp_award_times_out_without_a_visible_bounce(self) -> None:
+        world = GameWorld(_level(EntitySpawn(type="GreenKoopa", x=10, y=13)))
+        shell = world.enemies[0]
+        shell.terrain_rebound_armed = True
+        world._begin_pending_shell_stomp_award(shell)
+        world.player.on_ground = False
+        world.player.velocity.y = -20
+
+        for _ in range(21):
+            world._process_pending_shell_stomp_award()
+
+        self.assertIsNone(world.pending_shell_stomp)
+        self.assertEqual(world.score, 0)
+
+    def test_kicking_and_waking_shell_reset_stomp_chain(self) -> None:
+        world = GameWorld(_level(EntitySpawn(type="GreenKoopa", x=10, y=13)))
+        shell = world.enemies[0]
+        shell.stomp_chain = 5
+        shell.terrain_rebound_armed = True
+        world._kick_shell(shell, 1)
+        self.assertEqual(shell.stomp_chain, 1)
+        self.assertFalse(shell.terrain_rebound_armed)
+
+        shell.stomp_chain = 5
+        shell.terrain_rebound_armed = True
+        shell.stomp_contact_active = True
+        world._wake_shell(shell)
+        self.assertEqual(shell.stomp_chain, 1)
+        self.assertFalse(shell.terrain_rebound_armed)
+        self.assertFalse(shell.stomp_contact_active)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -314,6 +314,51 @@ class GameWorldTests(unittest.TestCase):
 
         self.assertLess(world.player.velocity.y, 0)
 
+    def test_grounded_player_resets_stomp_combo_immediately(self) -> None:
+        world = GameWorld(_level_with_entities())
+        world.stomp_combo = 4
+        world.player.on_ground = True
+
+        world.update(keys=_no_keys(), jump_pressed=False, jump_held=False, jump_released=False, dt=0)
+
+        self.assertEqual(world.stomp_combo, 1)
+
+    def test_combo_past_table_awards_capped_oneup(self) -> None:
+        world = GameWorld(_level_with_entities())
+        world.stomp_combo = 11
+        world.lives = 128
+
+        world._award_combo_score(0, 0)
+
+        self.assertEqual(world.lives, 128)
+        self.assertEqual(world.popups[-1].text, "1UP")
+        self.assertIn("oneup", world.events)
+
+    def test_plain_solid_ceiling_plays_blockbump(self) -> None:
+        ceiling = Tile(x=3, y=11, type="Ground", sprite="gnd_red_1")
+        world = GameWorld(
+            LevelData(
+                meta=LevelMeta(name="Test", width=32, height=15),
+                foreground=(ceiling,),
+                background=(),
+                entities=(EntitySpawn(type="PlayerSpawn", x=3, y=13),),
+            )
+        )
+
+        world._handle_block_hit(pygame.Rect(3 * TILE_SIZE, 11 * TILE_SIZE, TILE_SIZE, TILE_SIZE))
+
+        self.assertIn("blockbump", world.events)
+
+    def test_timer_does_not_drain_while_dying(self) -> None:
+        world = GameWorld(_level_with_entities())
+        world.state = WorldState.DYING
+        world.respawn_timer = 1.0
+        world.time_remaining = 123.0
+
+        world.update(keys=_no_keys(), jump_pressed=False, jump_held=False, jump_released=False, dt=0.5)
+
+        self.assertEqual(world.time_remaining, 123.0)
+
 
 class _NoKeys:
     def __getitem__(self, _key: int) -> bool:

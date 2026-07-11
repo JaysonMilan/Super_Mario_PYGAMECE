@@ -62,7 +62,8 @@ def update_walker(world: EnemyAIWorld, enemy: Enemy, dt: float) -> None:
         if enemy.shell_state is ShellState.SHELL_KICKED:
             enemy.body.velocity.x = -before_vx
             enemy.body.facing = -enemy.body.facing
-            world.events.append("blockhit")
+            enemy.terrain_rebound_armed = True
+            world.events.append("blockbump")
         else:
             enemy.body.velocity.x = -before_vx if before_vx else -enemy.body.facing * 70.0
             enemy.body.facing = -enemy.body.facing

@@ -62,6 +62,8 @@ class MovingPlatformDef:
     width: float = 3.0
     ease_endpoints: bool = False
     ease_distance: float = 2.0
+    loop_mode: bool = False
+    phase: float = 0.0
 
 
 @dataclass(frozen=True, slots=True)
@@ -350,6 +352,8 @@ def _parse_moving(raw: dict[str, Any]) -> MovingPlatformDef:
         width=float(raw.get("width", 3.0)),
         ease_endpoints=bool(raw.get("ease_endpoints", False)),
         ease_distance=float(raw.get("ease_distance", 2.0)),
+        loop_mode=bool(raw.get("loop_mode", False)),
+        phase=max(0.0, min(1.0, float(raw.get("phase", 0.0)))),
     )
 
 

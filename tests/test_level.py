@@ -69,6 +69,18 @@ class LevelLoadingTests(unittest.TestCase):
         self.assertEqual(create_collectible(coin).sprite, "coin_0")
         self.assertEqual(create_collectible(mushroom).sprite, "mushroom")
 
+    def test_moving_platform_parses_loop_mode_and_clamped_phase(self) -> None:
+        level = parse_level(
+            {
+                "moving_platforms": [{"start_x": 1, "start_y": 2, "end_x": 3, "end_y": 2,
+                                      "loop_mode": True, "phase": 2.0}]
+            }
+        )
+
+        platform = level.moving_platforms[0]
+        self.assertTrue(platform.loop_mode)
+        self.assertEqual(platform.phase, 1.0)
+
 
 if __name__ == "__main__":
     unittest.main()

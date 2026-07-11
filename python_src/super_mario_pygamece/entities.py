@@ -93,6 +93,10 @@ class Enemy:
     kick_streak: int = 0
     kick_grace: float = 0.0  # freshly kicked shells can't hurt the kicker
     combo_timer: float = 0.0  # C++ ComboState::kComboWindow=0.67s; resets streak when it expires
+    stomp_chain: int = 1
+    terrain_rebound_armed: bool = False
+    stomp_contact_active: bool = False
+    level_spawn_active: bool = False
     shell_frames: tuple[str, ...] = ("koopa_shell_feet_0", "koopa_shell_feet_1")
     fireball_hits: int = 0  # Bowser soaks several hits before going down
     star_immune: bool = False  # C++ star_vulnerable=false (Bowser, Podoboo)
@@ -193,6 +197,7 @@ class MovingPlatform:
     speed: float
     ease_endpoints: bool = False
     ease_distance: float = 2.0
+    loop_mode: bool = False
     # Runtime state
     t: float = 0.0  # 0.0 to 1.0 interpolation
     direction: int = 1
