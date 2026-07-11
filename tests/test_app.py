@@ -14,6 +14,7 @@ warnings.filterwarnings("ignore", message="pkg_resources is deprecated.*", categ
 import pygame
 
 from super_mario_pygamece.app import AppState, PygameMario
+from super_mario_pygamece.entities import PipeState
 from super_mario_pygamece.paths import ProjectPaths
 from super_mario_pygamece.settings import STARTING_LIVES
 from super_mario_pygamece.world import WorldState
@@ -101,6 +102,40 @@ class PygameMarioAppTests(unittest.TestCase):
 
         self.assertTrue(running)
         self.assertEqual(app.state, AppState.TITLE)
+
+    def test_warp_resolves_sdl3_relative_destination_and_preserves_exit(self) -> None:
+        root = _fixture_root("app_warp")
+        self.addCleanup(shutil.rmtree, root.parent, True)
+        paths = _write_project_fixture(root)
+        _write_level(paths.sdl3_root / "build" / "Debug" / "assets" / "levels" / "1-1b.json", "1-1b")
+        app = PygameMario(level_path=paths.find_level("1-1"), paths=paths, audio_enabled=False)
+        app.world.player.pipe_dest_x = 18 * 32
+        app.world.player.pipe_dest_y = 12 * 32
+        app.world.player.pipe_exit_facing_right = False
+        app.world.player.pipe_exit_horizontal = True
+        app.world.time_remaining = 321.0
+
+        app._do_level_warp("assets/levels/1-1b.json")
+
+        self.assertEqual(app.level_path.stem, "1-1b")
+        self.assertEqual(app.world.player.pos.x, 18 * 32)
+        self.assertEqual(app.world.player.pos.y, 12 * 32)
+        self.assertEqual(app.world.player.pipe_state, PipeState.EXITING_LEFT)
+        self.assertEqual(app.world.time_remaining, 321.0)
+
+    def test_sublevel_completion_normalizes_to_next_main_stage(self) -> None:
+        root = _fixture_root("app_progression")
+        self.addCleanup(shutil.rmtree, root.parent, True)
+        paths = _write_project_fixture(root)
+        level_dir = paths.sdl3_root / "build" / "Debug" / "assets" / "levels"
+        _write_level(level_dir / "1-2c.json", "1-2c")
+        _write_level(level_dir / "1-3.json", "1-3")
+        app = PygameMario(level_path=paths.find_level("1-2c"), paths=paths, audio_enabled=False)
+
+        app._advance_to_next_level()
+
+        self.assertEqual(app.level_path.stem, "1-3")
+        self.assertEqual(app.state, AppState.PLAYING)
 
 
 def _fixture_root(name: str) -> Path:

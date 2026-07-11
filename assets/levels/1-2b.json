@@ -1,0 +1,972 @@
+{
+  "background": [],
+  "cheep_spawners": [],
+  "entities": [
+    {
+      "type": "PlayerSpawn",
+      "x": 3,
+      "y": 13
+    },
+    {
+      "type": "Coin",
+      "x": 6,
+      "y": 8
+    },
+    {
+      "type": "Coin",
+      "x": 7,
+      "y": 8
+    },
+    {
+      "type": "Coin",
+      "x": 8,
+      "y": 8
+    },
+    {
+      "type": "Coin",
+      "x": 9,
+      "y": 8
+    },
+    {
+      "type": "Coin",
+      "x": 10,
+      "y": 8
+    },
+    {
+      "type": "Coin",
+      "x": 11,
+      "y": 8
+    },
+    {
+      "type": "Coin",
+      "x": 12,
+      "y": 8
+    },
+    {
+      "type": "Coin",
+      "x": 13,
+      "y": 8
+    },
+    {
+      "type": "Coin",
+      "x": 14,
+      "y": 9
+    },
+    {
+      "type": "Coin",
+      "x": 5,
+      "y": 12
+    },
+    {
+      "type": "Coin",
+      "x": 6,
+      "y": 12
+    },
+    {
+      "type": "Coin",
+      "x": 7,
+      "y": 12
+    },
+    {
+      "type": "Coin",
+      "x": 8,
+      "y": 12
+    },
+    {
+      "type": "Coin",
+      "x": 9,
+      "y": 12
+    },
+    {
+      "type": "Coin",
+      "x": 10,
+      "y": 12
+    },
+    {
+      "type": "Coin",
+      "x": 11,
+      "y": 12
+    },
+    {
+      "type": "Coin",
+      "x": 12,
+      "y": 12
+    },
+    {
+      "type": "Coin",
+      "x": 13,
+      "y": 12
+    }
+  ],
+  "falling_platforms": [],
+  "firebars": [],
+  "foreground": [
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 2,
+      "y": 2
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 5,
+      "y": 2
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 6,
+      "y": 2
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 7,
+      "y": 2
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 8,
+      "y": 2
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 9,
+      "y": 2
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 10,
+      "y": 2
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 11,
+      "y": 2
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 12,
+      "y": 2
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 13,
+      "y": 2
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 14,
+      "y": 2
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 15,
+      "y": 2
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 16,
+      "y": 2
+    },
+    {
+      "sprite": "pipe1_left_top",
+      "type": "Pipe",
+      "x": 17,
+      "y": 2
+    },
+    {
+      "sprite": "pipe1_right_top",
+      "type": "Pipe",
+      "x": 18,
+      "y": 2
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 2,
+      "y": 3
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 5,
+      "y": 3
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 6,
+      "y": 3
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 7,
+      "y": 3
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 8,
+      "y": 3
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 9,
+      "y": 3
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 10,
+      "y": 3
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 11,
+      "y": 3
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 12,
+      "y": 3
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 13,
+      "y": 3
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 14,
+      "y": 3
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 15,
+      "y": 3
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 16,
+      "y": 3
+    },
+    {
+      "sprite": "pipe1_left_bot",
+      "type": "Pipe",
+      "x": 17,
+      "y": 3
+    },
+    {
+      "sprite": "pipe1_right_bot",
+      "type": "Pipe",
+      "x": 18,
+      "y": 3
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 2,
+      "y": 4
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 5,
+      "y": 4
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 6,
+      "y": 4
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 7,
+      "y": 4
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 8,
+      "y": 4
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 9,
+      "y": 4
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 10,
+      "y": 4
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 11,
+      "y": 4
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 12,
+      "y": 4
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 13,
+      "y": 4
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 14,
+      "y": 4
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 15,
+      "y": 4
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 16,
+      "y": 4
+    },
+    {
+      "sprite": "pipe1_left_bot",
+      "type": "Pipe",
+      "x": 17,
+      "y": 4
+    },
+    {
+      "sprite": "pipe1_right_bot",
+      "type": "Pipe",
+      "x": 18,
+      "y": 4
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 2,
+      "y": 5
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 5,
+      "y": 5
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 6,
+      "y": 5
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 7,
+      "y": 5
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 8,
+      "y": 5
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 9,
+      "y": 5
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 10,
+      "y": 5
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 11,
+      "y": 5
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 12,
+      "y": 5
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 13,
+      "y": 5
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 14,
+      "y": 5
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 15,
+      "y": 5
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 16,
+      "y": 5
+    },
+    {
+      "sprite": "pipe1_left_bot",
+      "type": "Pipe",
+      "x": 17,
+      "y": 5
+    },
+    {
+      "sprite": "pipe1_right_bot",
+      "type": "Pipe",
+      "x": 18,
+      "y": 5
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 2,
+      "y": 6
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 15,
+      "y": 6
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 16,
+      "y": 6
+    },
+    {
+      "sprite": "pipe1_left_bot",
+      "type": "Pipe",
+      "x": 17,
+      "y": 6
+    },
+    {
+      "sprite": "pipe1_right_bot",
+      "type": "Pipe",
+      "x": 18,
+      "y": 6
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 2,
+      "y": 7
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 15,
+      "y": 7
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 16,
+      "y": 7
+    },
+    {
+      "sprite": "pipe1_left_bot",
+      "type": "Pipe",
+      "x": 17,
+      "y": 7
+    },
+    {
+      "sprite": "pipe1_right_bot",
+      "type": "Pipe",
+      "x": 18,
+      "y": 7
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 2,
+      "y": 8
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 15,
+      "y": 8
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 16,
+      "y": 8
+    },
+    {
+      "sprite": "pipe1_left_bot",
+      "type": "Pipe",
+      "x": 17,
+      "y": 8
+    },
+    {
+      "sprite": "pipe1_right_bot",
+      "type": "Pipe",
+      "x": 18,
+      "y": 8
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 2,
+      "y": 9
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 5,
+      "y": 9
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 6,
+      "y": 9
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 7,
+      "y": 9
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 8,
+      "y": 9
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 9,
+      "y": 9
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 10,
+      "y": 9
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 11,
+      "y": 9
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 12,
+      "y": 9
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 13,
+      "y": 9
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 14,
+      "y": 9
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 15,
+      "y": 9
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 16,
+      "y": 9
+    },
+    {
+      "sprite": "pipe1_left_bot",
+      "type": "Pipe",
+      "x": 17,
+      "y": 9
+    },
+    {
+      "sprite": "pipe1_right_bot",
+      "type": "Pipe",
+      "x": 18,
+      "y": 9
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 2,
+      "y": 10
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 15,
+      "y": 10
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 16,
+      "y": 10
+    },
+    {
+      "sprite": "pipe1_left_bot",
+      "type": "Pipe",
+      "x": 17,
+      "y": 10
+    },
+    {
+      "sprite": "pipe1_right_bot",
+      "type": "Pipe",
+      "x": 18,
+      "y": 10
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 2,
+      "y": 11
+    },
+    {
+      "sprite": "pipe1_hor_top_left",
+      "type": "Pipe",
+      "x": 15,
+      "y": 11
+    },
+    {
+      "sprite": "pipe1_hor_top_center",
+      "type": "Pipe",
+      "x": 16,
+      "y": 11
+    },
+    {
+      "sprite": "pipe1_hor_top_right",
+      "type": "Pipe",
+      "x": 17,
+      "y": 11
+    },
+    {
+      "sprite": "pipe1_right_bot",
+      "type": "Pipe",
+      "x": 18,
+      "y": 11
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 2,
+      "y": 12
+    },
+    {
+      "sprite": "pipe1_hor_bot_left",
+      "type": "Pipe",
+      "x": 15,
+      "y": 12
+    },
+    {
+      "sprite": "pipe1_hor_bot_center",
+      "type": "Pipe",
+      "x": 16,
+      "y": 12
+    },
+    {
+      "sprite": "pipe1_hor_bot_right",
+      "type": "Pipe",
+      "x": 17,
+      "y": 12
+    },
+    {
+      "sprite": "pipe1_right_bot",
+      "type": "Pipe",
+      "x": 18,
+      "y": 12
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 2,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 3,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 4,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 5,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 6,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 7,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 8,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 9,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 10,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 11,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 12,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 13,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 14,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 15,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 16,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 17,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 18,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 2,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 3,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 4,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 5,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 6,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 7,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 8,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 9,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 10,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 11,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 12,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 13,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 14,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 15,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 16,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 17,
+      "y": 14
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 18,
+      "y": 14
+    }
+  ],
+  "level": {
+    "camera_bounds": {
+      "max_x": 20.0,
+      "max_y": 15.0,
+      "min_x": 0.0,
+      "min_y": 0.0
+    },
+    "can_scroll_backward": true,
+    "description": "World 1-2 underground coin bonus room",
+    "height": 15,
+    "level_type": "Bonus",
+    "music": "assets/sounds/underground.wav",
+    "name": "World 1-2 Coin Room",
+    "tile_size": 1.0,
+    "time_limit": 400,
+    "width": 20
+  },
+  "moving_platforms": [],
+  "seesaw_pairs": [],
+  "upfires": [],
+  "version": "1.0",
+  "warps": [
+    {
+      "dest_level": "assets/levels/1-2a.json",
+      "dest_world_x": 118.0,
+      "dest_world_y": 12.5,
+      "entry_dir": 1,
+      "entry_tile_x": 15,
+      "entry_tile_y": 12,
+      "exit_facing_right": true,
+      "exit_horizontal": false
+    }
+  ]
+}

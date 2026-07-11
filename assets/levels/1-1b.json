@@ -1,0 +1,741 @@
+{
+  "background": [],
+  "cheep_spawners": [],
+  "entities": [
+    {
+      "type": "PlayerSpawn",
+      "x": 2,
+      "y": 3
+    },
+    {
+      "type": "Coin",
+      "x": 5,
+      "y": 5
+    },
+    {
+      "type": "Coin",
+      "x": 6,
+      "y": 5
+    },
+    {
+      "type": "Coin",
+      "x": 7,
+      "y": 5
+    },
+    {
+      "type": "Coin",
+      "x": 8,
+      "y": 5
+    },
+    {
+      "type": "Coin",
+      "x": 9,
+      "y": 5
+    },
+    {
+      "type": "Coin",
+      "x": 5,
+      "y": 7
+    },
+    {
+      "type": "Coin",
+      "x": 6,
+      "y": 7
+    },
+    {
+      "type": "Coin",
+      "x": 7,
+      "y": 7
+    },
+    {
+      "type": "Coin",
+      "x": 8,
+      "y": 7
+    },
+    {
+      "type": "Coin",
+      "x": 9,
+      "y": 7
+    },
+    {
+      "type": "Coin",
+      "x": 5,
+      "y": 9
+    },
+    {
+      "type": "Coin",
+      "x": 6,
+      "y": 9
+    },
+    {
+      "type": "Coin",
+      "x": 7,
+      "y": 9
+    },
+    {
+      "type": "Coin",
+      "x": 8,
+      "y": 9
+    },
+    {
+      "type": "Coin",
+      "x": 9,
+      "y": 9
+    }
+  ],
+  "falling_platforms": [],
+  "firebars": [],
+  "foreground": [
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 0,
+      "y": 12
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 0,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 1,
+      "y": 12
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 1,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 2,
+      "y": 12
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 2,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 3,
+      "y": 12
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 3,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 4,
+      "y": 12
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 4,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 5,
+      "y": 12
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 5,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 6,
+      "y": 12
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 6,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 7,
+      "y": 12
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 7,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 8,
+      "y": 12
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 8,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 9,
+      "y": 12
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 9,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 10,
+      "y": 12
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 10,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 11,
+      "y": 12
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 11,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 12,
+      "y": 12
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 12,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 13,
+      "y": 12
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 13,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 14,
+      "y": 12
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 14,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 15,
+      "y": 12
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 15,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 16,
+      "y": 12
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 16,
+      "y": 13
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 17,
+      "y": 12
+    },
+    {
+      "sprite": "gnd1",
+      "type": "Ground",
+      "x": 17,
+      "y": 13
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 0,
+      "y": 1
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 17,
+      "y": 1
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 0,
+      "y": 2
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 17,
+      "y": 2
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 0,
+      "y": 3
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 17,
+      "y": 3
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 0,
+      "y": 4
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 17,
+      "y": 4
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 0,
+      "y": 5
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 17,
+      "y": 5
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 0,
+      "y": 6
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 17,
+      "y": 6
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 0,
+      "y": 7
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 17,
+      "y": 7
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 0,
+      "y": 8
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 17,
+      "y": 8
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 0,
+      "y": 9
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 17,
+      "y": 9
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 0,
+      "y": 10
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 17,
+      "y": 10
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 0,
+      "y": 11
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 17,
+      "y": 11
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 4,
+      "y": 1
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 5,
+      "y": 1
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 6,
+      "y": 1
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 7,
+      "y": 1
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 8,
+      "y": 1
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 9,
+      "y": 1
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 10,
+      "y": 1
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 4,
+      "y": 10
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 5,
+      "y": 10
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 6,
+      "y": 10
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 7,
+      "y": 10
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 8,
+      "y": 10
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 9,
+      "y": 10
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 4,
+      "y": 11
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 5,
+      "y": 11
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 6,
+      "y": 11
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 7,
+      "y": 11
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 8,
+      "y": 11
+    },
+    {
+      "sprite": "brick1",
+      "type": "Brick",
+      "x": 9,
+      "y": 11
+    },
+    {
+      "sprite": "pipe_left_top",
+      "type": "Pipe",
+      "x": 14,
+      "y": 1
+    },
+    {
+      "sprite": "pipe_right_top",
+      "type": "Pipe",
+      "x": 15,
+      "y": 1
+    },
+    {
+      "sprite": "pipe_left_bot",
+      "type": "Pipe",
+      "x": 14,
+      "y": 2
+    },
+    {
+      "sprite": "pipe_right_bot",
+      "type": "Pipe",
+      "x": 15,
+      "y": 2
+    },
+    {
+      "sprite": "pipe_left_bot",
+      "type": "Pipe",
+      "x": 14,
+      "y": 3
+    },
+    {
+      "sprite": "pipe_right_bot",
+      "type": "Pipe",
+      "x": 15,
+      "y": 3
+    },
+    {
+      "sprite": "pipe_left_bot",
+      "type": "Pipe",
+      "x": 14,
+      "y": 4
+    },
+    {
+      "sprite": "pipe_right_bot",
+      "type": "Pipe",
+      "x": 15,
+      "y": 4
+    },
+    {
+      "sprite": "pipe_left_bot",
+      "type": "Pipe",
+      "x": 14,
+      "y": 5
+    },
+    {
+      "sprite": "pipe_right_bot",
+      "type": "Pipe",
+      "x": 15,
+      "y": 5
+    },
+    {
+      "sprite": "pipe_left_bot",
+      "type": "Pipe",
+      "x": 14,
+      "y": 6
+    },
+    {
+      "sprite": "pipe_right_bot",
+      "type": "Pipe",
+      "x": 15,
+      "y": 6
+    },
+    {
+      "sprite": "pipe_left_bot",
+      "type": "Pipe",
+      "x": 14,
+      "y": 7
+    },
+    {
+      "sprite": "pipe_right_bot",
+      "type": "Pipe",
+      "x": 15,
+      "y": 7
+    },
+    {
+      "sprite": "pipe_left_bot",
+      "type": "Pipe",
+      "x": 14,
+      "y": 8
+    },
+    {
+      "sprite": "pipe_right_bot",
+      "type": "Pipe",
+      "x": 15,
+      "y": 8
+    },
+    {
+      "sprite": "pipe_left_bot",
+      "type": "Pipe",
+      "x": 14,
+      "y": 9
+    },
+    {
+      "sprite": "pipe_right_bot",
+      "type": "Pipe",
+      "x": 15,
+      "y": 9
+    },
+    {
+      "sprite": "pipe_left_bot",
+      "type": "Pipe",
+      "x": 14,
+      "y": 10
+    },
+    {
+      "sprite": "pipe_right_bot",
+      "type": "Pipe",
+      "x": 15,
+      "y": 10
+    },
+    {
+      "sprite": "pipe_left_bot",
+      "type": "Pipe",
+      "x": 14,
+      "y": 11
+    },
+    {
+      "sprite": "pipe_right_bot",
+      "type": "Pipe",
+      "x": 15,
+      "y": 11
+    },
+    {
+      "sprite": "pipe_hor_top_left",
+      "type": "Pipe",
+      "x": 12,
+      "y": 10
+    },
+    {
+      "sprite": "pipe_hor_top_center",
+      "type": "Pipe",
+      "x": 13,
+      "y": 10
+    },
+    {
+      "sprite": "pipe_hor_bot_left",
+      "type": "Pipe",
+      "x": 12,
+      "y": 11
+    },
+    {
+      "sprite": "pipe_hor_bot_center",
+      "type": "Pipe",
+      "x": 13,
+      "y": 11
+    }
+  ],
+  "level": {
+    "camera_bounds": {
+      "max_x": 18.0,
+      "max_y": 14.0,
+      "min_x": 0.0,
+      "min_y": 0.0
+    },
+    "can_scroll_backward": true,
+    "description": "World 1-1 underground coin bonus room",
+    "height": 14,
+    "level_type": "Underground",
+    "music": "assets/sounds/underground.wav",
+    "name": "World 1-1 Bonus",
+    "tile_size": 1.0,
+    "time_limit": 400,
+    "width": 18
+  },
+  "moving_platforms": [],
+  "seesaw_pairs": [],
+  "upfires": [],
+  "version": "1.0",
+  "warps": [
+    {
+      "dest_level": "assets/levels/1-1.json",
+      "dest_world_x": 179.0,
+      "dest_world_y": 12.5,
+      "entry_dir": 1,
+      "entry_tile_x": 12,
+      "entry_tile_y": 11,
+      "exit_facing_right": true,
+      "exit_horizontal": false
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import unittest
+from pathlib import Path
 
 from super_mario_pygamece.level import (
     EntitySpawn,
@@ -9,6 +10,7 @@ from super_mario_pygamece.level import (
     generate_template_level,
     goal_rect,
     is_collectible_spawn,
+    load_level,
     parse_level,
     tile_rect,
 )
@@ -80,6 +82,12 @@ class LevelLoadingTests(unittest.TestCase):
         platform = level.moving_platforms[0]
         self.assertTrue(platform.loop_mode)
         self.assertEqual(platform.phase, 1.0)
+
+    def test_synced_world_one_files_all_load(self) -> None:
+        level_dir = Path(__file__).resolve().parents[1] / "assets" / "levels"
+        for name in ("1-1", "1-1b", "1-2", "1-2a", "1-2b", "1-2c", "1-3"):
+            with self.subTest(name=name):
+                self.assertTrue(load_level(level_dir / f"{name}.json").meta.name)
 
 
 if __name__ == "__main__":

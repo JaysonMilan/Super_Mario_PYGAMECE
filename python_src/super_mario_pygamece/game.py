@@ -183,7 +183,7 @@ class PygameMario:
         import re
 
         stem = self.level_path.stem if self.level_path else ""
-        match = re.fullmatch(r"(\d+)-(\d+)", stem)
+        match = re.fullmatch(r"(\d+)-(\d+)[a-z]*", stem, re.IGNORECASE)
         next_path = None
         crossed_world = False
         if match:
@@ -240,14 +240,15 @@ class PygameMario:
         self.audio.play_events(("princessmusic",))
 
     def _do_level_warp(self, dest_level_name: str) -> None:
+        dest_stem = Path(dest_level_name).stem
         found_path = None
         for p in self.level_paths:
-            if p.stem == dest_level_name or p.name == dest_level_name:
+            if p.stem == dest_stem or p.name == dest_level_name:
                 found_path = p
                 break
 
         if not found_path:
-            try_path = self.paths.atlas_dir.parent.parent / "levels" / f"{dest_level_name}.json"
+            try_path = self.paths.local_assets / "levels" / f"{dest_stem}.json"
             if try_path.exists():
                 found_path = try_path
 
@@ -255,6 +256,7 @@ class PygameMario:
             self.world.sync_to_session()
             active_player_index = self.world.active_player_index
             sessions = self.world.sessions
+            time_remaining = self.world.time_remaining
 
             dest_x = self.world.player.pipe_dest_x
             dest_y = self.world.player.pipe_dest_y
@@ -269,6 +271,7 @@ class PygameMario:
             self.world.active_player_index = active_player_index
             self.world.apply_from_session()
             self.world._apply_state_change(sessions[active_player_index].state)
+            self.world.time_remaining = time_remaining
 
             self.world.player.pos.x = dest_x
             self.world.player.pos.y = dest_y
